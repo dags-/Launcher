@@ -30,9 +30,9 @@ import static com.skcraft.launcher.LauncherUtils.checkInterrupted;
 
 @Log
 public final class WebpagePanel extends JPanel {
-
+    
     private final WebpagePanel self = this;
-
+    
     private URL url;
     private boolean activated;
     private JEditorPane documentView;
@@ -40,20 +40,20 @@ public final class WebpagePanel extends JPanel {
     private JProgressBar progressBar;
     private Thread thread;
     private Border browserBorder;
-
+    
     public static WebpagePanel forURL(URL url, boolean lazy) {
         return new WebpagePanel(url, lazy);
     }
-
+    
     public static WebpagePanel forHTML(String html) {
         return new WebpagePanel(html);
     }
 
     private WebpagePanel(URL url, boolean lazy) {
         this.url = url;
-
+        
         setLayout(new BorderLayout());
-
+        
         if (lazy) {
             setPlaceholder();
         } else {
@@ -64,16 +64,16 @@ public final class WebpagePanel extends JPanel {
 
     private WebpagePanel(String text) {
         this.url = null;
-
+        
         setLayout(new BorderLayout());
-
+        
         setDocument();
         setDisplay(text, null);
     }
-
+    
     public WebpagePanel(boolean lazy) {
         this.url = null;
-
+        
         setLayout(new BorderLayout());
 
         if (lazy) {
@@ -98,10 +98,10 @@ public final class WebpagePanel extends JPanel {
 
     private void setDocument() {
         activated = true;
-
+        
         JLayeredPane panel = new JLayeredPane();
         panel.setLayout(new WebpageLayoutManager());
-
+        
         documentView = new JEditorPane();
         documentView.setOpaque(false);
         documentView.setBorder(null);
@@ -126,7 +126,7 @@ public final class WebpagePanel extends JPanel {
                 documentScroll.setBorder(browserBorder);
             }
         }
-
+        
         progressBar = new JProgressBar();
         progressBar.setIndeterminate(true);
         panel.add(progressBar, new Integer(2));
@@ -134,19 +134,19 @@ public final class WebpagePanel extends JPanel {
         SwingHelper.removeOpaqueness(this);
         SwingHelper.removeOpaqueness(documentView);
         SwingHelper.removeOpaqueness(documentScroll);
-
+        
         add(panel, BorderLayout.CENTER);
     }
-
+    
     private void setPlaceholder() {
         activated = false;
-
+        
         JLayeredPane panel = new JLayeredPane();
         panel.setBorder(new CompoundBorder(
                 BorderFactory.createEtchedBorder(), BorderFactory
                         .createEmptyBorder(4, 4, 4, 4)));
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-
+        
         final JButton showButton = new JButton("Load page");
         showButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         showButton.addActionListener(new ActionListener() {
@@ -157,7 +157,7 @@ public final class WebpagePanel extends JPanel {
                 fetchAndDisplay(url);
             }
         });
-
+        
         // Center the button vertically.
         panel.add(new Box.Filler(
                 new Dimension(0, 0),
@@ -168,13 +168,13 @@ public final class WebpagePanel extends JPanel {
                 new Dimension(0, 0),
                 new Dimension(0, 0),
                 new Dimension(1000, 1000)));
-
+        
         add(panel, BorderLayout.CENTER);
     }
-
+    
     /**
      * Browse to a URL.
-     *
+     * 
      * @param url the URL
      * @param onlyChanged true to only browse if the last URL was different
      * @return true if only the URL was changed
@@ -183,28 +183,28 @@ public final class WebpagePanel extends JPanel {
         if (onlyChanged && this.url != null && this.url.equals(url)) {
             return false;
         }
-
+        
         this.url = url;
-
+        
         if (activated) {
             fetchAndDisplay(url);
         }
-
+        
         return true;
     }
 
     /**
      * Update the page. This has to be run in the Swing event thread.
-     *
+     * 
      * @param url the URL
      */
     private synchronized void fetchAndDisplay(URL url) {
         if (thread != null) {
             thread.interrupt();
         }
-
+        
         progressBar.setVisible(true);
-
+        
         thread = new Thread(new FetchWebpage(url));
         thread.setDaemon(true);
         thread.start();
@@ -214,17 +214,17 @@ public final class WebpagePanel extends JPanel {
         progressBar.setVisible(false);
         documentView.setContentType("text/html");
         HTMLDocument document = (HTMLDocument) documentView.getDocument();
-
+        
         // Clear existing styles
         Enumeration<?> e = document.getStyleNames();
         while (e.hasMoreElements()) {
             Object o = e.nextElement();
             document.removeStyle((String) o);
         }
-
+        
         document.setBase(baseUrl);
         documentView.setText(text);
-
+        
         documentView.setCaretPosition(0);
     }
 
@@ -234,15 +234,14 @@ public final class WebpagePanel extends JPanel {
         documentView.setText(text);
         documentView.setCaretPosition(0);
     }
-
+    
     private class FetchWebpage implements Runnable {
         private URL url;
-
+        
         public FetchWebpage(URL url) {
             this.url = url;
-            System.out.println(url.toString());
         }
-
+        
         @Override
         public void run() {
             HttpURLConnection conn = null;
@@ -276,20 +275,18 @@ public final class WebpagePanel extends JPanel {
                     s.append(buf, 0, len);
                 }
                 String result = s.toString();
-
+                
                 checkInterrupted();
 
                 setDisplay(result, LauncherUtils.concat(url, ""));
             } catch (IOException e) {
-              e.printStackTrace();
                 if (Thread.interrupted()) {
                     return;
                 }
-
+                
                 log.log(Level.WARNING, "Failed to fetch page", e);
                 setError("Failed to fetch page: " + e.getMessage());
             } catch (InterruptedException e) {
-              e.printStackTrace();
             } finally {
                 if (conn != null)
                     conn.disconnect();
