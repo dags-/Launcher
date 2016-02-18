@@ -6,6 +6,8 @@
 
 package com.skcraft.launcher.creator.dialog;
 
+import com.jidesoft.swing.SearchableUtils;
+import com.jidesoft.swing.TableSearchable;
 import com.skcraft.launcher.creator.Creator;
 import com.skcraft.launcher.swing.DefaultTable;
 import com.skcraft.launcher.swing.SwingHelper;
@@ -19,13 +21,13 @@ import java.awt.event.KeyEvent;
 
 public class PackManagerFrame extends JFrame {
 
-    @Getter private final JButton newPackButton = new JButton("New Pack", SwingHelper.readImageIcon(Creator.class, "new.png"));
-    @Getter private final JButton importButton = new JButton("Add Existing", SwingHelper.readImageIcon(Creator.class, "import.png"));
-    @Getter private final JButton editConfigButton = new JButton("Modify", SwingHelper.readImageIcon(Creator.class, "edit.png"));
-    @Getter private final JButton openFolderButton = new JButton("Open", SwingHelper.readImageIcon(Creator.class, "open_folder.png"));
-    @Getter private final JButton checkProblemsButton = new JButton("Check", SwingHelper.readImageIcon(Creator.class, "check.png"));
-    @Getter private final JButton testButton = new JButton("Test", SwingHelper.readImageIcon(Creator.class, "test.png"));
-    @Getter private final JButton buildButton = new JButton("Build", SwingHelper.readImageIcon(Creator.class, "build.png"));
+    @Getter private final JButton newPackButton = new JButton("New Pack", SwingHelper.createIcon(Creator.class, "new.png"));
+    @Getter private final JButton importButton = new JButton("Add Existing", SwingHelper.createIcon(Creator.class, "import.png"));
+    @Getter private final JButton editConfigButton = new JButton("Modify", SwingHelper.createIcon(Creator.class, "edit.png"));
+    @Getter private final JButton openFolderButton = new JButton("Open", SwingHelper.createIcon(Creator.class, "open_folder.png"));
+    @Getter private final JButton checkProblemsButton = new JButton("Check", SwingHelper.createIcon(Creator.class, "check.png"));
+    @Getter private final JButton testButton = new JButton("Test", SwingHelper.createIcon(Creator.class, "test.png"));
+    @Getter private final JButton buildButton = new JButton("Build", SwingHelper.createIcon(Creator.class, "build.png"));
 
     @Getter private final JMenuItem newPackMenuItem = new JMenuItem("New Pack...");
     @Getter private final JMenuItem newPackAtLocationMenuItem = new JMenuItem("New Pack at Location...");
@@ -47,6 +49,7 @@ public class PackManagerFrame extends JFrame {
     @Getter private final JMenuItem deployServerMenuItem = new JMenuItem("Deploy Server...");
     @Getter private final JMenuItem generatePackagesMenuItem = new JMenuItem("Generate packages.json...");
     @Getter private final JMenuItem openOutputFolderMenuItem = new JMenuItem("Open Upload Folder");
+    @Getter private final JMenuItem versionCheckMenuItem = new JMenuItem("Check for Mod Updates");
     @Getter private final JMenuItem openWorkspaceFolderMenuItem = new JMenuItem("Open Workspace Folder");
     @Getter private final JMenuItem openLauncherFolderMenuItem = new JMenuItem("Open Test Launcher Folder");
     @Getter private final JMenuItem openWebRootMenuItem = new JMenuItem("Open Test Web Server Folder");
@@ -65,7 +68,7 @@ public class PackManagerFrame extends JFrame {
         pack();
         setLocationRelativeTo(null);
 
-        SwingHelper.setIconImage(this, Creator.class, "icon.png");
+        SwingHelper.setFrameIcon(this, Creator.class, "icon.png");
     }
 
     private void initComponents() {
@@ -81,6 +84,9 @@ public class PackManagerFrame extends JFrame {
 
         container.add(createToolbar(), "dock north");
         container.add(SwingHelper.wrapScrollPane(packTable), "grow, span, w null:800:null");
+
+        TableSearchable tableSearchable = SearchableUtils.installSearchable(packTable);
+        tableSearchable.setMainIndex(-1);
 
         add(container, BorderLayout.CENTER);
     }
@@ -176,6 +182,8 @@ public class PackManagerFrame extends JFrame {
         menu.setMargin(menuInset);
         menu.setMnemonic('t');
         menuBar.add(menu);
+        menu.add(versionCheckMenuItem);
+        menu.addSeparator();
         menu.add(openWorkspaceFolderMenuItem);
         menu.add(openLauncherFolderMenuItem);
         menu.add(openWebRootMenuItem);
