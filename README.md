@@ -1,7 +1,7 @@
 ArdaCraft Launcher
 ================
 
-The ArdaCraft launcher is based on [SKCraft's](https://github.com/SKCraft/Launcher) with full credit to the SKCRaft team for developing the tools to make this launcher and modpack.
+The ArdaCraft launcher is based on [SKCraft's](https://github.com/SKCraft/Launcher) with full credit to the SKCraft team for developing the tools to make this launcher and modpack.
 
 ================
 
@@ -13,7 +13,7 @@ Here's a quick video on how to install the Launcher:
 
 VIDEO HERE
 
-Download the latest launcher [here](https://github.com/ArdaCraft/SKLauncher/releases/latest) It will download to whereever you've set the browser to download to.
+Download the latest launcher [![Github Releases](https://img.shields.io/github/downloads/ArdaCraft/SKLauncher/latest/total.svg?maxAge=2592000)](https://github.com/ArdaCraft/SKLauncher/releases/latest) It will download to where ever you've set the browser to download to.
 Once downloaded click on the launcher '.exe' or '.jar'. It should look something like this:
 
 ![Launcher](readme/launcher.png)
