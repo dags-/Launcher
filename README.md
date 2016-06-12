@@ -1,7 +1,8 @@
 ArdaCraft Launcher
+
 ================
+
 The ArdaCraft launcher is based on [SKCraft's](https://github.com/SKCraft/Launcher) with full credit to the SKCRaft team for developing the tools to make this launcher and modpack.
-================
 
 First things first. You must have [Java 64 bit](https://java.com/en/) installed for the launcher to work properly.
 
