@@ -1,6 +1,5 @@
 ArdaCraft Launcher
 ================
-
 The ArdaCraft launcher is based on [SKCraft's](https://github.com/SKCraft/Launcher) with full credit to the SKCRaft team for developing the tools to make this launcher and modpack.
 
 ================
