@@ -1,124 +1,43 @@
-SKCraft Launcher
+ArdaCraft Launcher
 ================
 
-SKCraft Launcher provides a platform for creating, testing, and distributing modpacks for groups of all sizes. It 100% open source and works on Windows, Mac OS X and Linux/BSD.
+The ArdaCraft launcher is based on [SKCraft's](https://github.com/SKCraft/Launcher) with full credit to the SKCRaft team for developing the tools to make this launcher and modpack.
 
-With this platform, you have **full control** of the modpacks that you choose to release.
+================
 
-Every other launcher platform either requires you to maintain cryptic JSON/XML files (error prone and a lot of extra work), requires distributing a .zip of your modpack (therefore not supporting delta downloads and wasting disk space), or requires a complicated server setup where you have to install certain software on your server. In our case, we **(1)** threw away any need for JSON/XML files when making modpacks, **(2)** don't require a .zip and yet still can support delta downloads and **(3)** require absolutely zero server setup (if you only know FTP, that's enough).
+First things first. You must have [Java 64 bit](https://java.com/en/) installed for the launcher to work properly.
 
-What to be aware of? You'll probably need a few hours to get everything working. Fortunately, we have a [detailed wiki](https://github.com/SKCraft/Launcher/wiki) with screenshots for every step, intended for someone with minimal technical experience.
+### Installation of the launcher
 
-### Features
+Here's a quick video on how to install the Launcher:
 
-* No XML/JSON files involved to create or update a modpack
-* Create a modpack by dragging and dropping mod .jars into a mods/ folder
-* Support for LiteLoader, Forge, and JAR mods
-* Support for resource packs
-* Support for all and any modpack files
-* Test modpacks without even needing a separate launcher
-* Multiple modpacks in the launcher
-* Deduplication of files (only upload a mod once for all modpacks)
-* Delta downloads when updating (only changed files)
-* Download resume
-* No need to host old versions; users can update from any previous version
-* No PHP or complex server setup necessary
-* Compatible with all standard website hosting and CDNs
-* Optional mods/files support
-* Support for default configuration files
-* Modpack-specific Java flags
-* "Hidden" modpacks that require a special access key (this *does* require PHP support)
+VIDEO HERE
 
-The wiki provides a detailed tutorial for configuring the launcher. You will need a website or an older Dropbox account to host your modpack's files, but there are several free website hosting options (with PHP support) listed on the wiki (with tutorials).
+Download the latest launcher [here](https://github.com/ArdaCraft/SKLauncher/releases/latest) It will download to whereever you've set the browser to download to.
+Once downloaded click on the launcher '.exe' or '.jar'. It should look something like this:
 
-### Making Modpacks
+![Launcher](readme/launcher.png)
 
-Making modpacks is extremely easy: you can use our modpack creator tools:
+Click on the ArdaCraft Modpack tab on the left of the launcher.
 
-![Modpack Creator](readme/pack_manager.png)
+![Modpack](readme/modpack.gif)
 
-If installing mods for your own game only requires putting a .jar file into a mods folder, why should making a modpack be any harder?
+You will be prompted to use your Minecraft account login. Our launcher uses the same login as the default Minecraft launcher, and we do not see any of your information.
+There will then be a prompt to select optional mods, you can select what you want to your liking, and we suggest you select the recommended mods.
 
-To get started, you just make a folder that looks like your Minecraft installation folder:
+![options](/readme/options.png)
 
-* src/**config**/
-* src/**mods**/
-* src/**resourcepacks**/
-* loaders/
+The launcher will then download the needed packages, and depending on your internet speed, may take anywhere from a few seconds, to a few minutes.
 
-Support for Minecraft Forge and LiteLoader merely involves putting their installer .jars into the loaders folder.
+When Minecraft launches, your Minecraft may be in the default resourcepack. This is done because the ArdaCraft resourcepack is quite large, and some people may have trouble loading it for the first time launching the modpack. You need to select the ArdaCraft resourcepack in the resourcepack options before you join the server.
 
-### Great Client
+![resourcepack](/readme/resourcepack.gif)
 
-The launcher has a beautiful dark UI that's elegant and easy to use (although a native UI is also available). Display your own webpages so users always know what's up when they start the game.
+Once your resourcepack is loaded you are ready to join the server! Go to multiplayer, and connect to the server via mc.ardacraft.me
 
-![Skinned](readme/launcher_skinned.png)
+![ip](/readme/ip.gif)
 
-When it comes to launching your modpacks, users can start, abort, and resume updates at any time. Files are downloaded in parallel, and the launcher knows how to handle the removal of files from the modpack.
-
-Users can select those optional features that you have added:
-
-![Optional Features](readme/features.png)
-
-The launcher can **even update itself**.
-
-...and you can use it in portable mode too.
-
-### More Features
-
-All of the modpack tools can be used to create a server modpack alongside the client modpack!
-
-You can optionally use **command line tools** only, without the GUI entirely. Combine the launcher with Git and Jenkins (or whatever you prefer) to automatically build modpack releases when you push a new version.
-
-### History
-
-The launcher has been in development since the early days of Minecraft Alpha. It has powered and always has powered sk89q's own server, SKCraft.
-
-[The older 3.x version was can be found elsewhere](https://github.com/sk89q/SKMCLauncher).
-
-## Additional Screenshots
-
-You can also use the "plain" version of the launcher:
-
-![Main Launcher](readme/launcher.png)
-
-![Options](readme/options.png)
-
-![Console](readme/log.png)
-
-More of the Modpack Creator:
-
-![Modpack Creator](readme/modpack_creator.png)
-
-![Build Modpacks](readme/packages_generator.png)
-
-## Getting Started
-
-* [Read the wiki](https://github.com/SKCraft/Launcher/wiki)
-* [Forum to ask for help](http://forum.enginehub.org/forums/launcher.25/)
-* [Join us on IRC: #sklauncher on EsperNet (irc.esper.net)](https://webchat.esper.net/?channels=sklauncher)
-
-If you find the launcher useful, you can [support me on Patreon](https://www.patreon.com/sk89q).
-
-[![Support Me on Patreon](https://i.imgur.com/Sg03Bzc.png)](https://www.patreon.com/sk89q)
-
-## Compiling
-
-In your command prompt or terminal, run:
-
-	./gradlew clean build
-
-If you are on Windows:
-
-	gradlew clean build
-
-If you wish to import the project into an IDE, you must add support for Project Lombok (IntelliJ IDEA users: also enable annotation processing in compiler settings).
-
-## Contributing
-
-Pull requests can be submitted on GitHub, but we will accept them at our discretion. Please note that your code must follow Oracle's Java Code Conventions.
-
-Contributions by third parties must be dual licensed under the two licenses described within LICENSE.txt (GNU Lesser General Public License, version 3, and the 3-clause BSD license).
+Once you join, look around, talk to community members, and if you want to build, fill out a [builder application](http://ardacraft.me/application)
 
 ## License
 
