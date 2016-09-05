@@ -5,16 +5,10 @@ The ArdaCraft launcher is based on [SKCraft's](https://github.com/SKCraft/Launch
 
 ================
 
-First things first. You must have [Java 64 bit](https://java.com/en/) installed for the launcher to work properly.
+[![Github Releases](https://img.shields.io/github/downloads/ArdaCraft/SKLauncher/latest/total.svg?maxAge=2592000)](https://github.com/ArdaCraft/SKLauncher/releases/latest)
 
-### Installation of the launcher
-
-Here's a quick video on how to install the Launcher:
-
-VIDEO HERE
-
-Download the latest launcher [![Github Releases](https://img.shields.io/github/downloads/ArdaCraft/SKLauncher/latest/total.svg?maxAge=2592000)](https://github.com/ArdaCraft/SKLauncher/releases/latest) It will download to where ever you've set the browser to download to.
-Once downloaded click on the launcher '.exe' or '.jar'. It should look something like this:
+### Using the launcher
+Click on the launcher '.exe' or '.jar'. It should look something like this:
 
 ![Launcher](readme/launcher.png)
 
@@ -36,8 +30,6 @@ When Minecraft launches, your Minecraft may be in the default resourcepack. This
 Once your resourcepack is loaded you are ready to join the server! Go to multiplayer, and connect to the server via mc.ardacraft.me
 
 ![ip](/readme/ip.gif)
-
-Once you join, look around, talk to community members, and if you want to build, fill out a [builder application](http://ardacraft.me/application)
 
 ## License
 
