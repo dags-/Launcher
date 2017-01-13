@@ -41,7 +41,8 @@ public class JavaLocalRuntime {
     public File getRuntime() {
         try {
             String os = getOS();
-            String architecture = getArchitecture();
+            // Don't support linux, osx must be 64 bit, windows maybe 32 or 64bit
+            String architecture = os.equals("windows") ? getArchitecture() : "64";
             log("Detected system: {0} {1}", os, architecture);
             runner.setProgress(0.1, SharedLocale.tr("runner.findingLocalJRE"));
 
