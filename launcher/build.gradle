@@ -15,6 +15,9 @@ dependencies {
     compile 'com.beust:jcommander:1.32'
     compile 'com.miglayout:miglayout:3.7.4'
     compile 'com.google.code.findbugs:jsr305:3.0.0'
+    compile 'com.google.code.gson:gson:2.8.0'
+    compile 'org.apache.commons:commons-compress:1.13'
+    compile 'org.tukaani:xz:1.6'
 }
 
 processResources {

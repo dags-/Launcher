@@ -130,6 +130,14 @@ public class Runner implements Callable<Process>, ProgressObservable {
             throw e;
         }
 
+        File localJreRepo = new File(launcher.getBaseDir(), "jre");
+        JavaLocalRuntime localRuntime = new JavaLocalRuntime(this, localJreRepo, builder.getJvmPath());
+        File localJre = localRuntime.getRuntime();
+
+        if (localJre != null && localJre.exists()) {
+            builder.setJvmPath(localJre);
+        }
+
         progress = new DefaultProgress(0.9, SharedLocale.tr("runner.collectingArgs"));
 
         addJvmArgs();
@@ -346,6 +354,10 @@ public class Runner implements Callable<Process>, ProgressObservable {
         map.put("assets_index_name", versionManifest.getAssetsIndex());
 
         return map;
+    }
+
+    public void setProgress(double progress, String status) {
+        this.progress = new DefaultProgress(progress, status);
     }
 
     @Override
