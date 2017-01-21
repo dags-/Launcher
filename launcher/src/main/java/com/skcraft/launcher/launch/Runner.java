@@ -87,6 +87,7 @@ public class Runner implements Callable<Process>, ProgressObservable {
         if (!jarPath.exists()) {
             jarPath = launcher.getJarPath(versionManifest);
         }
+        jarPath.setExecutable(true);
         return jarPath;
     }
 

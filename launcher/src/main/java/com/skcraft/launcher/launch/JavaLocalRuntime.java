@@ -4,7 +4,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
-import com.skcraft.concurrency.DefaultProgress;
 import com.skcraft.launcher.util.SharedLocale;
 import org.apache.commons.compress.compressors.lzma.LZMACompressorInputStream;
 
@@ -25,7 +24,7 @@ import java.util.zip.ZipFile;
  */
 public class JavaLocalRuntime {
 
-    private static final String meta_url = "http://launchermeta.mojang.com/mc-staging/launcher.json";
+    private static final String launcher_data = "http://launchermeta.mojang.com/mc-staging/launcher.json";
     private static final Logger logger = Logger.getLogger("LocalRuntime");
 
     private final File localStorage;
@@ -38,24 +37,34 @@ public class JavaLocalRuntime {
         this.runner = runner;
     }
 
+    private void makeExecutable(File java) {
+        if (java.exists() && java.setExecutable(true)) {
+            log("Making file executable {0}", java.getAbsolutePath());
+        } else {
+            log("Could not make file executable {0}", java.getAbsolutePath());
+        }
+    }
+
     public File getRuntime() {
         try {
             String os = getOS();
             // Don't support linux, osx must be 64 bit, windows maybe 32 or 64bit
             String architecture = os.equals("windows") ? getArchitecture() : "64";
             log("Detected system: {0} {1}", os, architecture);
-            runner.setProgress(0.1, SharedLocale.tr("runner.findingLocalJRE"));
 
+            runner.setProgress(0.1, SharedLocale.tr("localJre.findingJre"));
             JsonObject jre = getJRE(os, architecture);
+
             String url = jre.get("url").getAsString();
             String version = jre.get("version").getAsString();
             log("Latest available JRE: {0}", version);
-            runner.setProgress(0.2, SharedLocale.tr("runner.findingLocalJRE"));
+            runner.setProgress(0.2, SharedLocale.tr("localJre.findingJre"));
 
             File dir = new File(localStorage, version + "-x" + architecture);
-            File bin = new File(dir, "bin");
+            File bin = new File(dir, "bin").getAbsoluteFile();
             if (bin.exists()) {
-                runner.setProgress(1.0, SharedLocale.tr("runner.findingLocalJRE"));
+                runner.setProgress(1.0, SharedLocale.tr("localJre.findingJre"));
+                makeExecutable(new File(bin, "java"));
                 log("Setting local JRE {0} bin: {1}", version, bin);
                 return bin;
             }
@@ -63,22 +72,21 @@ public class JavaLocalRuntime {
             File zip = new File(localStorage, version + ".zip");
             File lzma = new File(localStorage, version + ".lzma");
 
+            runner.setProgress(0.6, SharedLocale.tr("localJre.downloadingJre"));
             downloadURL(url, lzma);
-            runner.setProgress(0.5, SharedLocale.tr("runner.findingLocalJRE"));
 
+            runner.setProgress(0.8, SharedLocale.tr("localJre.extractingJre"));
             decompressLZMA(lzma, zip);
-            runner.setProgress(0.6, SharedLocale.tr("runner.findingLocalJRE"));
-
             extractZip(zip, dir);
-            runner.setProgress(0.7, SharedLocale.tr("runner.findingLocalJRE"));
 
+            runner.setProgress(0.9, SharedLocale.tr("localJre.cleaningUp"));
             deleteFile(lzma);
             deleteFile(zip);
 
-            runner.setProgress(0.8, SharedLocale.tr("runner.findingLocalJRE"));
+            runner.setProgress(1.0, SharedLocale.tr("localJre.findingJre"));
+            makeExecutable(new File(bin, "java"));
 
             log("Setting local JRE {0} bin: {1}", version, bin);
-
             return bin;
         } catch (Throwable t) {
             return fallbackJre;
@@ -105,7 +113,7 @@ public class JavaLocalRuntime {
         JsonObject jre = null;
 
         try {
-            HttpURLConnection connection = (HttpURLConnection) new URL(meta_url).openConnection();
+            HttpURLConnection connection = (HttpURLConnection) new URL(launcher_data).openConnection();
             inputStream = connection.getInputStream();
             JsonElement data = new JsonParser().parse(new JsonReader(new InputStreamReader(inputStream)));
             JsonObject meta = data.getAsJsonObject();
