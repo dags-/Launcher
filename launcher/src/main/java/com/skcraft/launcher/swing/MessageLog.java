@@ -104,6 +104,10 @@ public class MessageLog extends JPanel {
     public void clear() {
         textComponent.setText("");
     }
+
+    public void setText(String text) {
+        textComponent.setText(text);
+    }
     
     /**
      * Log a message given the {@link javax.swing.text.AttributeSet}.
