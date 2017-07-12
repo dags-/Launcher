@@ -6,7 +6,6 @@
 
 package com.skcraft.launcher.swing;
 
-import com.skcraft.launcher.LauncherUtils;
 import com.skcraft.launcher.util.LimitLinesDocumentListener;
 import com.skcraft.launcher.util.SimpleLogFormatter;
 
