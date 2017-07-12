@@ -139,16 +139,29 @@ public class ConsoleFrame extends JFrame {
         });
     }
 
+    public static synchronized String getConsoleText() {
+        ConsoleFrame frame = globalFrame;
+        if (frame == null) {
+            return "";
+        }
+        return frame.messageLog.getPastableText();
+    }
+
     public static void showMessages() {
+        initMessages();
+        ConsoleFrame frame = globalFrame;
+        frame.setVisible(true);
+    }
+
+    public static void initMessages() {
         ConsoleFrame frame = globalFrame;
         if (frame == null) {
             frame = new ConsoleFrame(10000, false);
             globalFrame = frame;
             frame.setTitle(SharedLocale.tr("console.launcherConsoleTitle"));
             frame.registerLoggerHandler();
-            frame.setVisible(true);
         } else {
-            frame.setVisible(true);
+            frame.getMessageLog().clear();
             frame.registerLoggerHandler();
             frame.requestFocus();
         }

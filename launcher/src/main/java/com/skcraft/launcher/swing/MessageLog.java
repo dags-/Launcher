@@ -6,7 +6,6 @@
 
 package com.skcraft.launcher.swing;
 
-import com.skcraft.launcher.LauncherUtils;
 import com.skcraft.launcher.util.LimitLinesDocumentListener;
 import com.skcraft.launcher.util.SimpleLogFormatter;
 
@@ -103,6 +102,10 @@ public class MessageLog extends JPanel {
 
     public void clear() {
         textComponent.setText("");
+    }
+
+    public void setText(String text) {
+        textComponent.setText(text);
     }
     
     /**

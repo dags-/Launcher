@@ -17,7 +17,10 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.*;
 import java.net.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static com.skcraft.launcher.LauncherUtils.checkInterrupted;
 import static org.apache.commons.io.IOUtils.closeQuietly;

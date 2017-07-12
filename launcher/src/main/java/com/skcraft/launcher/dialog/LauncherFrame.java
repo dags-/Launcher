@@ -14,24 +14,25 @@ import com.skcraft.launcher.launch.LaunchListener;
 import com.skcraft.launcher.launch.LaunchOptions;
 import com.skcraft.launcher.launch.LaunchOptions.UpdatePolicy;
 import com.skcraft.launcher.swing.*;
-import com.skcraft.launcher.util.SharedLocale;
-import com.skcraft.launcher.util.SwingExecutor;
+import com.skcraft.launcher.util.*;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.extern.java.Log;
-import net.miginfocom.swing.MigLayout;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.skcraft.launcher.util.SharedLocale.tr;
 
@@ -43,17 +44,16 @@ public class LauncherFrame extends JFrame {
 
     private final Launcher launcher;
 
+    private final Color transparent = new Color(0, 0, 0, 0);
     @Getter
     private final InstanceTable instancesTable = new InstanceTable();
     private final InstanceTableModel instancesModel;
     @Getter
     private final JScrollPane instanceScroll = new JScrollPane(instancesTable);
-    private WebpagePanel webView;
-    private JSplitPane splitPane;
-    private final JButton launchButton = new JButton(SharedLocale.tr("launcher.launch"));
-    private final JButton refreshButton = new JButton(SharedLocale.tr("launcher.checkForUpdates"));
-    private final JButton optionsButton = new JButton(SharedLocale.tr("launcher.options"));
-    private final JButton selfUpdateButton = new JButton(SharedLocale.tr("launcher.updateLauncher"));
+    private final JButton launchButton = createButton(SharedLocale.tr("launcher.launch"));
+    private final JButton refreshButton = createButton(SharedLocale.tr("launcher.checkForUpdates"));
+    private final JButton optionsButton = createButton(SharedLocale.tr("launcher.options"));
+    private final JButton selfUpdateButton = createButton(SharedLocale.tr("launcher.updateLauncher"));
     private final JCheckBox updateCheck = new JCheckBox(SharedLocale.tr("launcher.downloadUpdates"));
 
     /**
@@ -68,12 +68,12 @@ public class LauncherFrame extends JFrame {
         instancesModel = new InstanceTableModel(launcher.getInstances());
 
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        setMinimumSize(new Dimension(400, 300));
+        setMinimumSize(new Dimension(650, 360));
         initComponents();
         pack();
         setLocationRelativeTo(null);
 
-        SwingHelper.setFrameIcon(this, Launcher.class, "icon.png");
+        SwingHelper.setFrameIcon(this, LauncherFrame.class, "/com/skcraft/launcher/icon.png");
 
         SwingUtilities.invokeLater(new Runnable() {
             @Override
@@ -83,12 +83,35 @@ public class LauncherFrame extends JFrame {
         });
     }
 
+    private JButton createButton(String label) {
+        JButton button = new JButton(label);
+        button.setFocusPainted(false);
+        button.setBorderPainted(false);
+        return button;
+    }
+
+    private JPanel loadLogo() {
+        JPanel panel = new JPanel();
+        panel.setOpaque(false);
+        panel.setBackground(transparent);
+        panel.setLayout(new BorderLayout());
+
+        Image image = SwingHelper.readBufferedImage(LauncherFrame.class,  "/com/skcraft/launcher/header.png");
+        if (image != null) {
+            ImageIcon icon = new ImageIcon(image);
+            JLabel label = new JLabel(icon);
+            panel.add(label, BorderLayout.LINE_END);
+            return panel;
+        }
+
+        return panel;
+    }
+
     private void initComponents() {
         JPanel container = createContainerPanel();
-        container.setLayout(new MigLayout("fill, insets dialog", "[][]push[][]", "[grow][]"));
+        container.setBackground(transparent);
+        container.setLayout(new BorderLayout());
 
-        webView = createNewsPanel();
-        splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, instanceScroll, webView);
         selfUpdateButton.setVisible(launcher.getUpdateManager().getPendingUpdate());
 
         launcher.getUpdateManager().addPropertyChangeListener(new PropertyChangeListener() {
@@ -96,24 +119,48 @@ public class LauncherFrame extends JFrame {
             public void propertyChange(PropertyChangeEvent evt) {
                 if (evt.getPropertyName().equals("pendingUpdate")) {
                     selfUpdateButton.setVisible((Boolean) evt.getNewValue());
-
                 }
             }
         });
 
         updateCheck.setSelected(true);
         instancesTable.setModel(instancesModel);
+        instancesTable.setBackground(new Color(255, 255, 255, 96));
+        optionsButton.setPreferredSize(new Dimension(125, 40));
+        launchButton.setPreferredSize(new Dimension(125, 40));
         launchButton.setFont(launchButton.getFont().deriveFont(Font.BOLD));
+
+        JPanel updateControls = new JPanel();
+        updateControls.setMaximumSize(new Dimension(900, 30));
+        updateControls.setLayout(new GridLayout());
+        updateControls.add(refreshButton);
+        updateControls.add(updateCheck);
+
+        JPanel launchControls = new JPanel();
+        launchControls.setBackground(transparent);
+        launchControls.add(optionsButton);
+        launchControls.add(launchButton);
+
+        JPanel left = new JPanel();
+        left.setOpaque(false);
+        left.setBackground(transparent);
+        left.setLayout(new BorderLayout());
+        left.add(instancesTable, BorderLayout.CENTER);
+        left.add(updateControls, BorderLayout.PAGE_END);
+
+        JPanel right = new JPanel();
+        right.setOpaque(false);
+        right.setBackground(transparent);
+        right.setLayout(new BorderLayout());
+        right.add(loadLogo(), BorderLayout.PAGE_START);
+        right.add(launchControls, BorderLayout.PAGE_END);
+
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, left, right);
         splitPane.setDividerLocation(200);
         splitPane.setDividerSize(4);
-        splitPane.setOpaque(false);
-        container.add(splitPane, "grow, wrap, span 5, gapbottom unrel, w null:680, h null:350");
+        splitPane.setBackground(transparent);
+        container.add(splitPane, BorderLayout.CENTER);
         SwingHelper.flattenJSplitPane(splitPane);
-        container.add(refreshButton);
-        container.add(updateCheck);
-        container.add(selfUpdateButton);
-        container.add(optionsButton);
-        container.add(launchButton);
 
         add(container, BorderLayout.CENTER);
 
@@ -127,6 +174,55 @@ public class LauncherFrame extends JFrame {
         });
 
         instancesTable.addMouseListener(new DoubleClickToButtonAdapter(launchButton));
+
+        instancesTable.addComponentListener(new ComponentListener() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                repaint();
+            }
+
+            @Override
+            public void componentMoved(ComponentEvent e) {
+                repaint();
+            }
+
+            @Override
+            public void componentShown(ComponentEvent e) {
+
+            }
+
+            @Override
+            public void componentHidden(ComponentEvent e) {
+
+            }
+        });
+
+        instancesTable.addMouseListener(new MouseListener() {
+            @Override
+            public void mouseClicked(MouseEvent mouseEvent) {
+                repaint();
+            }
+
+            @Override
+            public void mousePressed(MouseEvent mouseEvent) {
+                repaint();
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent mouseEvent) {
+
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent mouseEvent) {
+
+            }
+
+            @Override
+            public void mouseExited(MouseEvent mouseEvent) {
+
+            }
+        });
 
         refreshButton.addActionListener(new ActionListener() {
             @Override
@@ -172,7 +268,7 @@ public class LauncherFrame extends JFrame {
     }
 
     protected JPanel createContainerPanel() {
-        return new JPanel();
+        return new BackgroundPanel(getBackgroundURLs(), 10000L);
     }
 
     /**
@@ -188,9 +284,9 @@ public class LauncherFrame extends JFrame {
      * Popup the menu for the instances.
      *
      * @param component the component
-     * @param x mouse X
-     * @param y mouse Y
-     * @param selected the selected instance, possibly null
+     * @param x         mouse X
+     * @param y         mouse Y
+     * @param selected  the selected instance, possibly null
      */
     private void popupInstanceMenu(Component component, int x, int y, final Instance selected) {
         JPopupMenu popup = new JPopupMenu();
@@ -335,6 +431,7 @@ public class LauncherFrame extends JFrame {
                     instancesTable.setRowSelectionInterval(0, 0);
                 }
                 requestFocus();
+                LauncherFrame.this.repaint();
             }
         }, SwingExecutor.INSTANCE);
 
@@ -348,6 +445,8 @@ public class LauncherFrame extends JFrame {
     }
 
     private void launch() {
+        ConsoleFrame.initMessages();
+
         boolean permitUpdate = updateCheck.isSelected();
         Instance instance = launcher.getInstances().get(instancesTable.getSelectedRow());
 
@@ -360,7 +459,21 @@ public class LauncherFrame extends JFrame {
         launcher.getLaunchSupervisor().launch(options);
     }
 
+    private List<String> getBackgroundURLs() {
+        String address = launcher.getProperties().getProperty("backgroundsUrl");
+        BackgroundProvider provider = getProvider(address);
+        return provider.getBackgrounds(address);
+    }
+
+    private BackgroundProvider getProvider(String url) {
+        if (url.toLowerCase().contains("reddit.com/r/")) {
+            return new RedditImageScraper();
+        }
+        return new JsonImageScraper();
+    }
+
     private static class LaunchListenerImpl implements LaunchListener {
+
         private final WeakReference<LauncherFrame> frameRef;
         private final Launcher launcher;
 

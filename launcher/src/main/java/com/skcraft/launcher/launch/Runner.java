@@ -12,6 +12,7 @@ import com.google.common.base.Strings;
 import com.google.common.io.Files;
 import com.skcraft.concurrency.DefaultProgress;
 import com.skcraft.concurrency.ProgressObservable;
+import com.skcraft.concurrency.SettableProgress;
 import com.skcraft.launcher.*;
 import com.skcraft.launcher.auth.Session;
 import com.skcraft.launcher.install.ZipExtract;
@@ -87,7 +88,6 @@ public class Runner implements Callable<Process>, ProgressObservable {
         if (!jarPath.exists()) {
             jarPath = launcher.getJarPath(versionManifest);
         }
-        jarPath.setExecutable(true);
         return jarPath;
     }
 
@@ -97,8 +97,11 @@ public class Runner implements Callable<Process>, ProgressObservable {
             throw new LauncherException("Update required", SharedLocale.tr("runner.updateRequired"));
         }
 
+        SettableProgress settableProgress = new SettableProgress("", 0);
+        progress = settableProgress;
+
         config = launcher.getConfig();
-        builder = new JavaProcessBuilder();
+        builder = new JavaProcessBuilder(settableProgress);
         assetsRoot = launcher.getAssets();
 
         // Load manifiests
@@ -129,14 +132,6 @@ public class Runner implements Callable<Process>, ProgressObservable {
             instance.setInstalled(false);
             Persistence.commitAndForget(instance);
             throw e;
-        }
-
-        File localJreRepo = new File(launcher.getBaseDir(), "jre");
-        JavaLocalRuntime localRuntime = new JavaLocalRuntime(this, localJreRepo, builder.getJvmPath());
-        File localJre = localRuntime.getRuntime();
-
-        if (localJre != null && localJre.exists()) {
-            builder.setJvmPath(localJre);
         }
 
         progress = new DefaultProgress(0.9, SharedLocale.tr("runner.collectingArgs"));
@@ -355,10 +350,6 @@ public class Runner implements Callable<Process>, ProgressObservable {
         map.put("assets_index_name", versionManifest.getAssetsIndex());
 
         return map;
-    }
-
-    public void setProgress(double progress, String status) {
-        this.progress = new DefaultProgress(progress, status);
     }
 
     @Override

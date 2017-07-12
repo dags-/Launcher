@@ -8,8 +8,8 @@ package com.skcraft.launcher.dialog;
 
 import com.skcraft.launcher.Configuration;
 import com.skcraft.launcher.Launcher;
-import com.skcraft.launcher.swing.*;
 import com.skcraft.launcher.persistence.Persistence;
+import com.skcraft.launcher.swing.*;
 import com.skcraft.launcher.util.SharedLocale;
 import lombok.NonNull;
 

@@ -8,7 +8,7 @@ package com.skcraft.launcher.launch;
 
 import com.google.common.base.Function;
 import com.skcraft.launcher.Launcher;
-import com.skcraft.launcher.dialog.LauncherFrame;
+import com.skcraft.launcher.dialog.ConsoleFrame;
 import com.skcraft.launcher.dialog.ProcessConsoleFrame;
 import com.skcraft.launcher.swing.MessageLog;
 import lombok.NonNull;
@@ -44,9 +44,16 @@ public class LaunchProcessHandler implements Function<Process, ProcessConsoleFra
                     consoleFrame = new ProcessConsoleFrame(CONSOLE_NUM_LINES, true);
                     consoleFrame.setProcess(process);
                     consoleFrame.setVisible(true);
+
                     MessageLog messageLog = consoleFrame.getMessageLog();
+                    messageLog.setText(ConsoleFrame.getConsoleText() + "\n");
                     messageLog.consume(process.getInputStream());
                     messageLog.consume(process.getErrorStream());
+
+                    String launchLogs = ConsoleFrame.getConsoleText();
+                    if (launchLogs.length() > 0) {
+                        messageLog.setText(ConsoleFrame.getConsoleText() + "\n");
+                    }
                 }
             });
 
