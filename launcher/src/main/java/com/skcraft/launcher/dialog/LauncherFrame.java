@@ -129,10 +129,10 @@ public class LauncherFrame extends JFrame {
         instancesTable.setBackground(new Color(255, 255, 255, 96));
         optionsButton.setPreferredSize(new Dimension(125, 40));
         launchButton.setPreferredSize(new Dimension(125, 40));
+        refreshButton.setPreferredSize(new Dimension(125, 30));
         launchButton.setFont(launchButton.getFont().deriveFont(Font.BOLD));
 
         JPanel updateControls = new JPanel();
-        updateControls.setMaximumSize(new Dimension(900, 30));
         updateControls.setLayout(new GridLayout());
         updateControls.add(refreshButton);
         updateControls.add(updateCheck);
