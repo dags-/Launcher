@@ -68,7 +68,7 @@ public class LauncherFrame extends JFrame {
         instancesModel = new InstanceTableModel(launcher.getInstances());
 
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        setMinimumSize(new Dimension(650, 360));
+        setMinimumSize(new Dimension(720, 400));
         initComponents();
         pack();
         setLocationRelativeTo(null);
@@ -85,8 +85,8 @@ public class LauncherFrame extends JFrame {
 
     private JButton createButton(String label) {
         JButton button = new JButton(label);
-        button.setFocusPainted(false);
         button.setBorderPainted(false);
+        button.setOpaque(true);
         return button;
     }
 
@@ -124,6 +124,7 @@ public class LauncherFrame extends JFrame {
         });
 
         updateCheck.setSelected(true);
+        updateCheck.setHorizontalAlignment(SwingConstants.CENTER);
         instancesTable.setModel(instancesModel);
         instancesTable.setBackground(new Color(255, 255, 255, 96));
         optionsButton.setPreferredSize(new Dimension(125, 40));
@@ -156,13 +157,15 @@ public class LauncherFrame extends JFrame {
         right.add(launchControls, BorderLayout.PAGE_END);
 
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, left, right);
-        splitPane.setDividerLocation(200);
+        splitPane.setDividerLocation(250);
         splitPane.setDividerSize(4);
         splitPane.setBackground(transparent);
         container.add(splitPane, BorderLayout.CENTER);
         SwingHelper.flattenJSplitPane(splitPane);
 
         add(container, BorderLayout.CENTER);
+
+        instancesTable.addMouseListener(new DoubleClickToButtonAdapter(launchButton));
 
         instancesModel.addTableModelListener(new TableModelListener() {
             @Override
@@ -172,8 +175,6 @@ public class LauncherFrame extends JFrame {
                 }
             }
         });
-
-        instancesTable.addMouseListener(new DoubleClickToButtonAdapter(launchButton));
 
         instancesTable.addComponentListener(new ComponentListener() {
             @Override
@@ -188,12 +189,12 @@ public class LauncherFrame extends JFrame {
 
             @Override
             public void componentShown(ComponentEvent e) {
-
+                repaint();
             }
 
             @Override
             public void componentHidden(ComponentEvent e) {
-
+                repaint();
             }
         });
 
@@ -224,6 +225,18 @@ public class LauncherFrame extends JFrame {
             }
         });
 
+        this.addFocusListener(new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                repaint();
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                repaint();
+            }
+        });
+
         refreshButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -243,6 +256,7 @@ public class LauncherFrame extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 showOptions();
+                repaint();
             }
         });
 
@@ -250,6 +264,7 @@ public class LauncherFrame extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 launch();
+                repaint();
             }
         });
 
@@ -268,7 +283,7 @@ public class LauncherFrame extends JFrame {
     }
 
     protected JPanel createContainerPanel() {
-        return new BackgroundPanel(getBackgroundURLs(), 10000L);
+        return new BackgroundPanel(getBackgroundURLs(), 8000L);
     }
 
     /**
