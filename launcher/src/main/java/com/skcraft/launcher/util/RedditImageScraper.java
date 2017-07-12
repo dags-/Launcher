@@ -18,8 +18,10 @@ public class RedditImageScraper implements BackgroundProvider {
 
     @Override
     public List<String> getBackgrounds(String address) {
+        HttpRequest request = null;
+
         try {
-            HttpRequest request = HttpRequest.get(new URL(address));
+            request = HttpRequest.get(new URL(address));
             JsonNode root = new ObjectMapper().readTree(request.execute().getInputStream());
             if (root.has("data")) {
                 JsonNode data = root.get("data");
@@ -33,6 +35,8 @@ public class RedditImageScraper implements BackgroundProvider {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            Closer.close(request);
         }
         return Collections.emptyList();
     }

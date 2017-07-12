@@ -1,14 +1,17 @@
 package com.skcraft.launcher.swing;
 
 import com.google.common.collect.ImmutableList;
+import com.skcraft.launcher.util.Closer;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -79,18 +82,21 @@ public class BackgroundPanel extends JPanel implements Runnable {
     }
 
     private ImageFader getImage(String address) {
+        InputStream inputStream = null;
         try {
             ImageFader current = reference.get();
             BufferedImage from = current != null ? current.getTo() : null;
-
             URL url = new URL(address);
-            BufferedImage to = ImageIO.read(url);
-
+            URLConnection connection = url.openConnection();
+            inputStream = connection.getInputStream();
+            BufferedImage to = ImageIO.read(inputStream);
             return new ImageFader(from, to, 1000L);
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            Closer.close(inputStream);
         }
         return null;
     }
