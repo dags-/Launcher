@@ -19,7 +19,6 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.extern.java.Log;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
@@ -28,10 +27,7 @@ import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.skcraft.launcher.util.SharedLocale.tr;
@@ -515,6 +511,11 @@ public class LauncherFrame extends JFrame {
 
         @Override
         public void gameClosed() {
+            // user may have cancelled the launch process before gameStarted() is called
+            LauncherFrame frame = frameRef.get();
+            if (frame != null) {
+                frame.dispose();
+            }
             launcher.showLauncherWindow();
         }
     }
