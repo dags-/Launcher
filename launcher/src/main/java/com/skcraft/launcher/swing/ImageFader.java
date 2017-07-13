@@ -42,7 +42,8 @@ public class ImageFader implements ActionListener {
     }
 
     public void paint(Component parent, Graphics graphics, int windowWidth, int windowHeight) {
-        Graphics2D g = (Graphics2D) graphics.create();
+        Graphics2D g = (Graphics2D) graphics;
+        Composite c = g.getComposite();
         g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 
         if (isFading() && from != null) {
@@ -52,7 +53,7 @@ public class ImageFader implements ActionListener {
         }
 
         drawScaled(g, parent, to, windowWidth, windowHeight);
-        g.dispose();
+        g.setComposite(c);
     }
 
     private void drawScaled(Graphics graphics, Component parent, BufferedImage image, int windowWidth, int windowHeight) {

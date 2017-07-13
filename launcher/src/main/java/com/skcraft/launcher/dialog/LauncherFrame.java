@@ -23,7 +23,9 @@ import javax.swing.*;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -44,8 +46,6 @@ public class LauncherFrame extends JFrame {
     @Getter
     private final InstanceTable instancesTable = new InstanceTable();
     private final InstanceTableModel instancesModel;
-    @Getter
-    private final JScrollPane instanceScroll = new JScrollPane(instancesTable);
     private final JButton launchButton = createButton(SharedLocale.tr("launcher.launch"));
     private final JButton refreshButton = createButton(SharedLocale.tr("launcher.checkForUpdates"));
     private final JButton optionsButton = createButton(SharedLocale.tr("launcher.options"));
@@ -64,7 +64,7 @@ public class LauncherFrame extends JFrame {
         instancesModel = new InstanceTableModel(launcher.getInstances());
 
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        setMinimumSize(new Dimension(720, 400));
+        setMinimumSize(new Dimension(720, 420));
         initComponents();
         pack();
         setLocationRelativeTo(null);
@@ -122,7 +122,6 @@ public class LauncherFrame extends JFrame {
         updateCheck.setSelected(true);
         updateCheck.setHorizontalAlignment(SwingConstants.CENTER);
         instancesTable.setModel(instancesModel);
-        instancesTable.setBackground(new Color(255, 255, 255, 96));
         optionsButton.setPreferredSize(new Dimension(125, 40));
         launchButton.setPreferredSize(new Dimension(125, 40));
         refreshButton.setPreferredSize(new Dimension(125, 30));
@@ -161,6 +160,7 @@ public class LauncherFrame extends JFrame {
 
         add(container, BorderLayout.CENTER);
 
+        instancesTable.setBackground(new Color(255, 255, 255 ,128));
         instancesTable.addMouseListener(new DoubleClickToButtonAdapter(launchButton));
 
         instancesModel.addTableModelListener(new TableModelListener() {
@@ -169,67 +169,6 @@ public class LauncherFrame extends JFrame {
                 if (instancesTable.getRowCount() > 0) {
                     instancesTable.setRowSelectionInterval(0, 0);
                 }
-            }
-        });
-
-        instancesTable.addComponentListener(new ComponentListener() {
-            @Override
-            public void componentResized(ComponentEvent e) {
-                repaint();
-            }
-
-            @Override
-            public void componentMoved(ComponentEvent e) {
-                repaint();
-            }
-
-            @Override
-            public void componentShown(ComponentEvent e) {
-                repaint();
-            }
-
-            @Override
-            public void componentHidden(ComponentEvent e) {
-                repaint();
-            }
-        });
-
-        instancesTable.addMouseListener(new MouseListener() {
-            @Override
-            public void mouseClicked(MouseEvent mouseEvent) {
-                repaint();
-            }
-
-            @Override
-            public void mousePressed(MouseEvent mouseEvent) {
-                repaint();
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent mouseEvent) {
-
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent mouseEvent) {
-
-            }
-
-            @Override
-            public void mouseExited(MouseEvent mouseEvent) {
-
-            }
-        });
-
-        this.addFocusListener(new FocusListener() {
-            @Override
-            public void focusGained(FocusEvent e) {
-                repaint();
-            }
-
-            @Override
-            public void focusLost(FocusEvent e) {
-                repaint();
             }
         });
 
@@ -252,7 +191,6 @@ public class LauncherFrame extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 showOptions();
-                repaint();
             }
         });
 
@@ -260,7 +198,6 @@ public class LauncherFrame extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 launch();
-                repaint();
             }
         });
 
@@ -442,7 +379,6 @@ public class LauncherFrame extends JFrame {
                     instancesTable.setRowSelectionInterval(0, 0);
                 }
                 requestFocus();
-                LauncherFrame.this.repaint();
             }
         }, SwingExecutor.INSTANCE);
 
