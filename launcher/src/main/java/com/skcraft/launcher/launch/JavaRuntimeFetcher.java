@@ -182,9 +182,8 @@ public class JavaRuntimeFetcher {
     }
 
     private void download(String url, File destination) {
-        if (destination.exists()) {
-            log.log(Level.INFO, "Download destination already exists, skipping download: {0}", destination);
-            return;
+        if (destination.exists() && destination.delete()) {
+            log.log(Level.INFO, "Download destination already exists, deleting: {0}", destination);
         }
 
         int attempts = 0;
