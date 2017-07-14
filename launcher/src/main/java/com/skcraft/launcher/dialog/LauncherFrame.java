@@ -127,6 +127,7 @@ public class LauncherFrame extends JFrame {
         updateCheck.setHorizontalAlignment(SwingConstants.CENTER);
         instancesTable.setModel(instancesModel);
         instancesTable.setBackground(new Color(255, 255, 255, 96));
+        selfUpdateButton.setPreferredSize(new Dimension(125, 40));
         optionsButton.setPreferredSize(new Dimension(125, 40));
         launchButton.setPreferredSize(new Dimension(125, 40));
         refreshButton.setPreferredSize(new Dimension(125, 30));
@@ -139,6 +140,7 @@ public class LauncherFrame extends JFrame {
 
         JPanel launchControls = new JPanel();
         launchControls.setBackground(transparent);
+        launchControls.add(selfUpdateButton);
         launchControls.add(optionsButton);
         launchControls.add(launchButton);
 
