@@ -54,8 +54,21 @@ public class JavaRuntimeFetcher {
 
         jre = getLatestJRE(x64);
         if (jre == null) {
-            log.log(Level.INFO, "Could not locate JRE in: {0}, exists: {1}", new Object[]{x64, x64.exists()});
+            log.log(Level.WARNING, "Could not locate JRE in: {0}, exists: {1}", new Object[]{x64, x64.exists()});
             return null;
+        }
+
+        boolean root = containsAll(jre, "license", "welcome");
+        boolean bin = containsAll(new File(jre, "bin"), "java");
+        boolean lib = containsAll(new File(jre, "lib"), "rt", "resources", "charsets");
+        if (!root || !bin || !lib) {
+            log.log(Level.WARNING, "Incomplete JRE installation detected in: {0}", new Object[]{jre});
+            installJRE();
+            jre = getLatestJRE(x64);
+            if (jre == null) {
+                log.log(Level.WARNING, "Could not locate JRE in: {0}, exists: {1}", new Object[]{x64, x64.exists()});
+                return null;
+            }
         }
 
         log.log(Level.INFO, "Detected JRE: {0}", jre);
@@ -169,9 +182,8 @@ public class JavaRuntimeFetcher {
     }
 
     private void download(String url, File destination) {
-        if (destination.exists()) {
-            log.log(Level.INFO, "Download destination already exists, skipping download: {0}", destination);
-            return;
+        if (destination.exists() && destination.delete()) {
+            log.log(Level.INFO, "Download destination already exists, deleting: {0}", destination);
         }
 
         int attempts = 0;
@@ -295,5 +307,21 @@ public class JavaRuntimeFetcher {
             Closer.close(byteChannel);
             Closer.close(outputStream);
         }
+    }
+
+    private boolean containsAll(File dir, String... lookups) {
+        String[] files = dir.list();
+        if (files != null) {
+            outer:
+            for (String lookup : lookups) {
+                for (String file : files) {
+                    if (file.toLowerCase().contains(lookup.toLowerCase())) {
+                        continue outer;
+                    }
+                }
+                return false;
+            }
+        }
+        return true;
     }
 }
