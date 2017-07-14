@@ -48,6 +48,8 @@ public class LauncherFrame extends JFrame {
     private final Color transparent = new Color(0, 0, 0, 0);
     @Getter
     private final InstanceTable instancesTable = new InstanceTable();
+    @Getter
+    private final JScrollPane instanceScroll = new JScrollPane(instancesTable);
     private final InstanceTableModel instancesModel;
     private final JButton launchButton = createButton(SharedLocale.tr("launcher.launch"));
     private final JButton refreshButton = createButton(SharedLocale.tr("launcher.checkForUpdates"));
