@@ -64,8 +64,7 @@ public class BackgroundPanel extends JPanel implements ActionListener {
             @Override
             public void run() {
                 int index = 1;
-
-                while (true) {
+                do {
                     try {
                         Thread.sleep(delay);
 
@@ -82,7 +81,7 @@ public class BackgroundPanel extends JPanel implements ActionListener {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                }
+                } while (isShowing());
             }
         };
     }
