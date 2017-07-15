@@ -15,6 +15,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -23,14 +24,16 @@ import java.util.concurrent.atomic.AtomicReference;
 public class BackgroundPanel extends JPanel implements ActionListener {
 
     private final AtomicReference<ImageFader> reference = new AtomicReference<ImageFader>();
+    private final AtomicBoolean showing = new AtomicBoolean(true);
     private final List<String> targets;
+    private final Timer timer;
     private final long delay;
 
     public BackgroundPanel(List<String> images, long interval) {
         this.targets = ImmutableList.copyOf(images);
         this.delay = interval;
-
-        new Timer(200, this).start();
+        this.timer = new Timer(200, this);
+        timer.start();
 
         if (images.size() > 0) {
             this.reference.set(getImage(images.get(0)));
@@ -56,7 +59,12 @@ public class BackgroundPanel extends JPanel implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        repaint();
+        if (isShowing()) {
+            repaint();
+        } else {
+            showing.set(false);
+            timer.stop();
+        }
     }
 
     private Runnable asyncTask() {
@@ -81,7 +89,7 @@ public class BackgroundPanel extends JPanel implements ActionListener {
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                } while (isShowing());
+                } while (showing.get());
             }
         };
     }
