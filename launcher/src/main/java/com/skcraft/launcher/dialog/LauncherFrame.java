@@ -44,17 +44,17 @@ public class LauncherFrame extends JFrame {
     private final Launcher launcher;
 
     @Getter
-    private final InstanceTable instancesTable = new InstanceTable();
-    private final InstanceTableModel instancesModel;
+    protected final InstanceTable instancesTable = new InstanceTable();
+    protected final InstanceTableModel instancesModel;
     @Getter
-    private final JScrollPane instanceScroll = new JScrollPane(instancesTable);
-    private WebpagePanel webView;
-    private JSplitPane splitPane;
-    private final JButton launchButton = new JButton(SharedLocale.tr("launcher.launch"));
-    private final JButton refreshButton = new JButton(SharedLocale.tr("launcher.checkForUpdates"));
-    private final JButton optionsButton = new JButton(SharedLocale.tr("launcher.options"));
-    private final JButton selfUpdateButton = new JButton(SharedLocale.tr("launcher.updateLauncher"));
-    private final JCheckBox updateCheck = new JCheckBox(SharedLocale.tr("launcher.downloadUpdates"));
+    protected final JScrollPane instanceScroll = new JScrollPane(instancesTable);
+    protected WebpagePanel webView;
+    protected JSplitPane splitPane;
+    protected final JButton launchButton = new JButton(SharedLocale.tr("launcher.launch"));
+    protected final JButton refreshButton = new JButton(SharedLocale.tr("launcher.checkForUpdates"));
+    protected final JButton optionsButton = new JButton(SharedLocale.tr("launcher.options"));
+    protected final JButton selfUpdateButton = new JButton(SharedLocale.tr("launcher.updateLauncher"));
+    protected final JCheckBox updateCheck = new JCheckBox(SharedLocale.tr("launcher.downloadUpdates"));
 
     /**
      * Create a new frame.
@@ -63,7 +63,6 @@ public class LauncherFrame extends JFrame {
      */
     public LauncherFrame(@NonNull Launcher launcher) {
         super(tr("launcher.title", launcher.getVersion()));
-
         this.launcher = launcher;
         instancesModel = new InstanceTableModel(launcher.getInstances());
 
@@ -83,7 +82,7 @@ public class LauncherFrame extends JFrame {
         });
     }
 
-    private void initComponents() {
+    protected void initComponents() {
         JPanel container = createContainerPanel();
         container.setLayout(new MigLayout("fill, insets dialog", "[][]push[][]", "[grow][]"));
 
@@ -115,7 +114,7 @@ public class LauncherFrame extends JFrame {
         container.add(optionsButton);
         container.add(launchButton);
 
-        add(container, BorderLayout.CENTER);
+        add(container);
 
         instancesModel.addTableModelListener(new TableModelListener() {
             @Override

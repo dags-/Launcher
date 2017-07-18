@@ -6,6 +6,7 @@
 
 package com.skcraft.launcher.launch;
 
+import com.skcraft.concurrency.SettableProgress;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -27,7 +28,7 @@ public class JavaProcessBuilder {
 
     private static final Pattern argsPattern = Pattern.compile("(?:([^\"]\\S*)|\"(.+?)\")\\s*");
 
-    @Getter @Setter private File jvmPath = JavaRuntimeFinder.findBestJavaPath();
+    @Getter @Setter private File jvmPath;
     @Getter @Setter private int minMemory;
     @Getter @Setter private int maxMemory;
     @Getter @Setter private int permGen;
@@ -36,6 +37,10 @@ public class JavaProcessBuilder {
     @Getter private final List<String> flags = new ArrayList<String>();
     @Getter private final List<String> args = new ArrayList<String>();
     @Getter @Setter private String mainClass;
+
+    public JavaProcessBuilder(SettableProgress progress) {
+        this.jvmPath = JavaRuntimeFinder.findBestJavaPath(progress);
+    }
 
     public void tryJvmPath(File path) throws IOException {
         // Try the parent directory

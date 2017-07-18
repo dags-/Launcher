@@ -6,9 +6,11 @@
 
 package com.skcraft.launcher.launch;
 
+import com.skcraft.concurrency.SettableProgress;
 import com.skcraft.launcher.util.Environment;
 import com.skcraft.launcher.util.Platform;
 import com.skcraft.launcher.util.WinRegistry;
+import lombok.extern.java.Log;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,10 +18,12 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
 
 /**
  * Finds the best Java runtime to use.
  */
+@Log
 public final class JavaRuntimeFinder {
 
     private JavaRuntimeFinder() {
@@ -30,7 +34,7 @@ public final class JavaRuntimeFinder {
      *
      * @return the JVM location, or null
      */
-    public static File findBestJavaPath() {
+    public static File findBestJavaPath(SettableProgress progress) {
         if (Environment.getInstance().getPlatform() != Platform.WINDOWS) {
             return null;
         }
@@ -44,7 +48,22 @@ public final class JavaRuntimeFinder {
         Collections.sort(entries);
         
         if (entries.size() > 0) {
-            return new File(entries.get(0).dir, "bin");
+            for (JREEntry entry : entries) {
+                String version = entry.version;
+                String architecture = entry.is64Bit ? "64bit" : "32bit";
+                log.log(Level.INFO, "Inspecting JRE candidate: {0} {1}", new Object[]{version, architecture});
+                if (entry.version.startsWith("1.8") && entry.is64Bit) {
+                    log.log(Level.INFO, "Detected suitable JRE: {0}", entry.version);
+                    return new File(entry.dir, "bin");
+                }
+            }
+        }
+
+        log.log(Level.INFO, "Searching for local JRE");
+        File localJre = new JavaRuntimeFetcher(progress).findJRE();
+        if (localJre != null && localJre.exists()) {
+            log.log(Level.INFO, "Local JRE detected: {0}", localJre);
+            return localJre;
         }
         
         return null;

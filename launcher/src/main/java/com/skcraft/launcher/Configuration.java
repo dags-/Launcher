@@ -35,6 +35,10 @@ public class Configuration {
     private String proxyUsername;
     private String proxyPassword;
     private String gameKey;
+    private int backgroundRed = 55;
+    private int backgroundGreen = 55;
+    private int backgroundBlue = 55;
+    private int backgroundAlpha = 255;
 
     @Override
     public boolean equals(Object o) {

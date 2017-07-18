@@ -12,6 +12,7 @@ import com.google.common.base.Strings;
 import com.google.common.io.Files;
 import com.skcraft.concurrency.DefaultProgress;
 import com.skcraft.concurrency.ProgressObservable;
+import com.skcraft.concurrency.SettableProgress;
 import com.skcraft.launcher.*;
 import com.skcraft.launcher.auth.Session;
 import com.skcraft.launcher.install.ZipExtract;
@@ -96,8 +97,11 @@ public class Runner implements Callable<Process>, ProgressObservable {
             throw new LauncherException("Update required", SharedLocale.tr("runner.updateRequired"));
         }
 
+        SettableProgress settableProgress = new SettableProgress("", 0);
+        progress = settableProgress;
+
         config = launcher.getConfig();
-        builder = new JavaProcessBuilder();
+        builder = new JavaProcessBuilder(settableProgress);
         assetsRoot = launcher.getAssets();
 
         // Load manifiests
