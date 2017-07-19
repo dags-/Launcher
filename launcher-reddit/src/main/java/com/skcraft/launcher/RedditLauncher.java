@@ -18,6 +18,7 @@ import java.util.logging.Level;
 public class RedditLauncher {
 
     public static void main(final String[] args) {
+
         Launcher.setupLogger();
 
         SwingUtilities.invokeLater(new Runnable() {
@@ -27,6 +28,7 @@ public class RedditLauncher {
                     Launcher launcher = Launcher.createFromArguments(args);
                     launcher.setMainWindowSupplier(new CustomWindowSupplier(launcher));
                     launcher.showLauncherWindow();
+
                 } catch (Throwable t) {
                     log.log(Level.WARNING, "Load failure", t);
                     SwingHelper.showErrorDialog(null, "Uh oh! The updater couldn't be opened because a " +

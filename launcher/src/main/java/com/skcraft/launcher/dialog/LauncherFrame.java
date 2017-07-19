@@ -50,11 +50,11 @@ public class LauncherFrame extends JFrame {
     protected final JScrollPane instanceScroll = new JScrollPane(instancesTable);
     protected WebpagePanel webView;
     protected JSplitPane splitPane;
-    protected final JButton launchButton = new JButton(SharedLocale.tr("launcher.launch"));
-    protected final JButton refreshButton = new JButton(SharedLocale.tr("launcher.checkForUpdates"));
-    protected final JButton optionsButton = new JButton(SharedLocale.tr("launcher.options"));
-    protected final JButton selfUpdateButton = new JButton(SharedLocale.tr("launcher.updateLauncher"));
-    protected final JCheckBox updateCheck = new JCheckBox(SharedLocale.tr("launcher.downloadUpdates"));
+    protected final JButton launchButton = createPrimaryButton(SharedLocale.tr("launcher.launch"));
+    protected final JButton refreshButton = createSecondaryButton(SharedLocale.tr("launcher.checkForUpdates"));
+    protected final JButton optionsButton = createPrimaryButton(SharedLocale.tr("launcher.options"));
+    protected final JButton selfUpdateButton = createPrimaryButton(SharedLocale.tr("launcher.updateLauncher"));
+    protected final JCheckBox updateCheck = createCheckBox(SharedLocale.tr("launcher.downloadUpdates"));
 
     /**
      * Create a new frame.
@@ -173,6 +173,18 @@ public class LauncherFrame extends JFrame {
 
     protected JPanel createContainerPanel() {
         return new JPanel();
+    }
+
+    protected JButton createPrimaryButton(String name) {
+        return new JButton(name);
+    }
+
+    protected JButton createSecondaryButton(String name) {
+        return new JButton(name);
+    }
+
+    protected JCheckBox createCheckBox(String name) {
+        return new JCheckBox(name);
     }
 
     /**

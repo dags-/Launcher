@@ -7,30 +7,62 @@
 package com.skcraft.launcher;
 
 import com.skcraft.launcher.dialog.LauncherFrame;
-import com.skcraft.launcher.swing.FrostPanel;
-import com.skcraft.launcher.swing.RedditBackgroundPanel;
-import com.skcraft.launcher.swing.SwingHelper;
-import com.skcraft.launcher.swing.WebpagePanel;
+import com.skcraft.launcher.swing.*;
 import lombok.NonNull;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowFocusListener;
+import java.util.Properties;
 
-public class RedditLauncherFrame extends LauncherFrame implements WindowFocusListener {
+public class RedditLauncherFrame extends LauncherFrame {
 
     private JPanel updateControls;
+    private Properties theme;
 
     public RedditLauncherFrame(@NonNull final Launcher launcher) {
         super(launcher);
         setMinimumSize(new Dimension(700, 420));
-        addWindowFocusListener(this);
     }
 
     @Override
     public WebpagePanel createNewsPanel() {
         return WebpagePanel.forHTML("");
+    }
+
+    @Override
+    public JButton createPrimaryButton(String name) {
+        Color unpressed = Color.decode(getTheme().getProperty("button.primary.color"));
+        Color pressed = Color.decode(getTheme().getProperty("button.primary.pressed.color"));
+        Color text = Color.decode(getTheme().getProperty("button.primary.text.color"));
+        int size = Integer.parseInt(getTheme().getProperty("button.primary.text.size"));
+        JButton button = new ColoredButton(name, unpressed, pressed);
+        button.setFont(new Font(button.getFont().getName(), Font.PLAIN, size));
+        button.setForeground(text);
+        return button;
+    }
+
+    @Override
+    protected JButton createSecondaryButton(String name) {
+        Color unpressed = Color.decode(getTheme().getProperty("button.secondary.color"));
+        Color pressed = Color.decode(getTheme().getProperty("button.secondary.pressed.color"));
+        Color text = Color.decode(getTheme().getProperty("button.secondary.text.color"));
+        int size = Integer.parseInt(getTheme().getProperty("button.secondary.text.size"));
+        JButton button = new ColoredButton(name, unpressed, pressed);
+        button.setFont(new Font(button.getFont().getName(), Font.PLAIN, size));
+        button.setForeground(text);
+        return button;
+    }
+
+    @Override
+    protected JCheckBox createCheckBox(String name) {
+        Color unpressed = Color.decode(getTheme().getProperty("button.secondary.color"));
+        Color text = Color.decode(getTheme().getProperty("button.secondary.text.color"));
+        int size = Integer.parseInt(getTheme().getProperty("button.secondary.text.size"));
+        JCheckBox box = new JCheckBox(name);
+        box.setFont(new Font(box.getFont().getName(), Font.PLAIN, size));
+        box.setBackground(unpressed);
+        box.setForeground(text);
+        return box;
     }
 
     @Override
@@ -46,10 +78,12 @@ public class RedditLauncherFrame extends LauncherFrame implements WindowFocusLis
         launchButton.setPreferredSize(new Dimension(120, 40));
 
         redditInit();
+        refreshBackgrounds();
     }
 
     private void redditInit() {
-        RedditBackgroundPanel root = new RedditBackgroundPanel(getSubReddit(), 8000L);
+        String address = String.format("https://reddit.com/r/%s.json", getTheme().getProperty("subbreddit"));
+        RedditBackgroundPanel root = new RedditBackgroundPanel(address, 8000L);
 
         JPanel launchControls = new JPanel();
         launchControls.setOpaque(false);
@@ -87,37 +121,31 @@ public class RedditLauncherFrame extends LauncherFrame implements WindowFocusLis
         add(root);
     }
 
-    @Override
-    public void windowGainedFocus(WindowEvent windowEvent) {
-        refreshBackgrounds();
-    }
-
-    @Override
-    public void windowLostFocus(WindowEvent windowEvent) {
-
-    }
-
-    private String getSubReddit() {
-        String news = launcher.prop("newsUrl");
-        if (!news.contains("reddit.com")) {
-            news = "https://reddit.com/r/wallpapers/new.json";
+    private Properties getTheme() {
+        if (theme == null) {
+            Properties theme = new Properties();
+            try {
+                theme.load(RedditLauncherFrame.class.getResourceAsStream("/com/skcraft/launcher/theme.properties"));
+                this.theme = theme;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
-
-        if (!news.endsWith(".json")) {
-            news = news + ".json";
-        }
-        return news;
+        return theme;
     }
 
     private void refreshBackgrounds() {
-        Configuration c = launcher.getConfig();
-        Color col1 = new Color(c.getBackgroundRed(), c.getBackgroundGreen(), c.getBackgroundBlue(), c.getBackgroundAlpha());
+        Color background = Color.decode(getTheme().getProperty("list.background.color"));
+        int alpha = Math.round(256 * Float.parseFloat(getTheme().getProperty("list.background.alpha")));
+        alpha = Math.min(alpha, 255);
+
+        Color col1 = new Color(background.getRed(), background.getGreen(), background.getBlue(), alpha);
         instancesTable.setBackground(col1);
 
-        int r = Math.min(c.getBackgroundRed() + 20, 255);
-        int g = Math.min(c.getBackgroundGreen() + 20, 255);
-        int b = Math.min(c.getBackgroundBlue() + 20, 255);
-        int a = Math.min(c.getBackgroundAlpha() + 40, 255);
+        int r = Math.min(background.getRed() + 20, 255);
+        int g = Math.min(background.getGreen() + 20, 255);
+        int b = Math.min(background.getBlue() + 20, 255);
+        int a = Math.min(alpha + 40, 255);
 
         Color col2 = new Color(r, g, b, a);
         updateControls.setBackground(col2);

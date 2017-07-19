@@ -8,8 +8,8 @@ package com.skcraft.launcher.dialog;
 
 import com.skcraft.launcher.Configuration;
 import com.skcraft.launcher.Launcher;
-import com.skcraft.launcher.swing.*;
 import com.skcraft.launcher.persistence.Persistence;
+import com.skcraft.launcher.swing.*;
 import com.skcraft.launcher.util.SharedLocale;
 import lombok.NonNull;
 
@@ -50,11 +50,6 @@ public class ConfigurationDialog extends JDialog {
     private final JButton cancelButton = new JButton(SharedLocale.tr("button.cancel"));
     private final JButton aboutButton = new JButton(SharedLocale.tr("options.about"));
     private final JButton logButton = new JButton(SharedLocale.tr("options.launcherConsole"));
-    private final FormPanel launcherPanel = new FormPanel();
-    private final JSpinner backgroundRed = new JSpinner();
-    private final JSpinner backgroundGreen = new JSpinner();
-    private final JSpinner backgroundBlue = new JSpinner();
-    private final JSpinner backgroundAlpha = new JSpinner();
 
     /**
      * Create a new configuration dialog.
@@ -75,11 +70,6 @@ public class ConfigurationDialog extends JDialog {
         setResizable(false);
         setLocationRelativeTo(owner);
 
-        backgroundRed.setModel(new SpinnerNumberModel(0, 0, 255, 1));
-        backgroundGreen.setModel(new SpinnerNumberModel(0, 0, 255, 1));
-        backgroundBlue.setModel(new SpinnerNumberModel(0, 0, 255, 1));
-        backgroundAlpha.setModel(new SpinnerNumberModel(0, 0, 255, 1));
-
         mapper.map(jvmPathText, "jvmPath");
         mapper.map(jvmArgsText, "jvmArgs");
         mapper.map(minMemorySpinner, "minMemory");
@@ -93,10 +83,6 @@ public class ConfigurationDialog extends JDialog {
         mapper.map(proxyUsernameText, "proxyUsername");
         mapper.map(proxyPasswordText, "proxyPassword");
         mapper.map(gameKeyText, "gameKey");
-        mapper.map(backgroundRed, "backgroundRed");
-        mapper.map(backgroundGreen, "backgroundGreen");
-        mapper.map(backgroundBlue, "backgroundBlue");
-        mapper.map(backgroundAlpha, "backgroundAlpha");
 
         mapper.copyFromObject();
     }
@@ -111,13 +97,6 @@ public class ConfigurationDialog extends JDialog {
         javaSettingsPanel.addRow(new JLabel(SharedLocale.tr("options.permGen")), permGenSpinner);
         SwingHelper.removeOpaqueness(javaSettingsPanel);
         tabbedPane.addTab(SharedLocale.tr("options.javaTab"), SwingHelper.alignTabbedPane(javaSettingsPanel));
-
-        launcherPanel.addRow(new JLabel("Background Red"), backgroundRed);
-        launcherPanel.addRow(new JLabel("Background Green"), backgroundGreen);
-        launcherPanel.addRow(new JLabel("Background Blue"), backgroundBlue);
-        launcherPanel.addRow(new JLabel("Background Alpha"), backgroundAlpha);
-        SwingHelper.removeOpaqueness(launcherPanel);
-        tabbedPane.addTab("Launcher", SwingHelper.alignTabbedPane(launcherPanel));
 
         gameSettingsPanel.addRow(new JLabel(SharedLocale.tr("options.windowWidth")), widthSpinner);
         gameSettingsPanel.addRow(new JLabel(SharedLocale.tr("options.windowHeight")), heightSpinner);
