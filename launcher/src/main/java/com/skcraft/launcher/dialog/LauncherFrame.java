@@ -41,7 +41,7 @@ import static com.skcraft.launcher.util.SharedLocale.tr;
 @Log
 public class LauncherFrame extends JFrame {
 
-    private final Launcher launcher;
+    protected final Launcher launcher;
 
     @Getter
     protected final InstanceTable instancesTable = new InstanceTable();
@@ -387,6 +387,7 @@ public class LauncherFrame extends JFrame {
 
         @Override
         public void gameClosed() {
+            gameStarted();
             launcher.showLauncherWindow();
         }
     }

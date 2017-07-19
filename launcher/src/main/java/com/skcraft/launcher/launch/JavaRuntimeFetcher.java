@@ -17,10 +17,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
-import java.util.Collections;
 import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -185,8 +182,8 @@ public class JavaRuntimeFetcher {
     }
 
     private void download(String url, File destination) {
-        if (destination.exists()) {
-            log.log(Level.INFO, "Download destination already exists, skipping download: {0}", destination);
+        if (destination.exists() && !destination.delete()) {
+            log.log(Level.INFO, "Unable to clean up existing file {0} before downloading", destination);
             return;
         }
 
@@ -226,8 +223,8 @@ public class JavaRuntimeFetcher {
             throw new UnsupportedOperationException("Attempted to decompress non-existent file: " + lzma);
         }
 
-        if (zip.exists()) {
-            log.log(Level.INFO, "Zip destination already exists, skipping decompression: {0}", zip);
+        if (zip.exists() && !zip.delete()) {
+            log.log(Level.INFO, "Unable to clean up existing file {0} before unzipping", zip);
             return;
         }
 

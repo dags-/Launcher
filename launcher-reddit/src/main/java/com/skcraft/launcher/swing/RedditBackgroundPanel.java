@@ -1,7 +1,7 @@
 package com.skcraft.launcher.swing;
 
-import com.skcraft.launcher.util.RedditUtils;
 import com.skcraft.launcher.util.Closer;
+import com.skcraft.launcher.util.RedditUtils;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -21,21 +21,21 @@ import java.util.concurrent.atomic.AtomicReference;
 /**
  * @author dags <dags@dags.me>
  */
-public class RedditBackgroundPanel extends JPanel implements Runnable, ActionListener {
+public class RedditBackgroundPanel extends JPanel implements Runnable, ActionListener, Paintable {
 
     private static final ImageFader EMPTY = getEmptyFader();
 
     private final AtomicReference<ImageFader> reference;
     private final AtomicBoolean showing;
-    private final String subreddit;
+    private final String address;
     private final Timer timer;
     private final long delay;
 
-    public RedditBackgroundPanel(String subreddit, long interval) {
+    public RedditBackgroundPanel(String address, long interval) {
         this.reference = new AtomicReference<ImageFader>(EMPTY);
         this.showing = new AtomicBoolean(true);
         this.timer = new Timer(200, this);
-        this.subreddit = subreddit;
+        this.address = address;
         this.delay = interval;
         this.timer.start();
 
@@ -73,9 +73,7 @@ public class RedditBackgroundPanel extends JPanel implements Runnable, ActionLis
     @Override
     public void run() {
         int index = 0;
-
-        String url = String.format("https://reddit.com/r/%s.json", subreddit);
-        List<String> targets = RedditUtils.getBackgrounds(url);
+        List<String> targets = RedditUtils.getBackgrounds(address);
 
         // async
         while (showing.get() && index < targets.size()) {

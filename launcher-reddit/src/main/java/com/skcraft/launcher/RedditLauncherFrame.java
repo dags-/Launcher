@@ -7,26 +7,30 @@
 package com.skcraft.launcher;
 
 import com.skcraft.launcher.dialog.LauncherFrame;
+import com.skcraft.launcher.swing.FrostPanel;
 import com.skcraft.launcher.swing.RedditBackgroundPanel;
 import com.skcraft.launcher.swing.SwingHelper;
+import com.skcraft.launcher.swing.WebpagePanel;
 import lombok.NonNull;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.FocusEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
 
 public class RedditLauncherFrame extends LauncherFrame implements WindowFocusListener {
 
-    private final Launcher launcher;
     private JPanel updateControls;
 
     public RedditLauncherFrame(@NonNull final Launcher launcher) {
         super(launcher);
-        this.launcher = launcher;
         setMinimumSize(new Dimension(700, 420));
         addWindowFocusListener(this);
+    }
+
+    @Override
+    public WebpagePanel createNewsPanel() {
+        return WebpagePanel.forHTML("");
     }
 
     @Override
@@ -45,6 +49,8 @@ public class RedditLauncherFrame extends LauncherFrame implements WindowFocusLis
     }
 
     private void redditInit() {
+        RedditBackgroundPanel root = new RedditBackgroundPanel(getSubReddit(), 8000L);
+
         JPanel launchControls = new JPanel();
         launchControls.setOpaque(false);
         launchControls.add(selfUpdateButton);
@@ -62,7 +68,8 @@ public class RedditLauncherFrame extends LauncherFrame implements WindowFocusLis
             headerImage.setHorizontalAlignment(SwingConstants.RIGHT);
         }
 
-        JPanel left = new JPanel(new BorderLayout());
+        JPanel left = new FrostPanel(root);
+        left.setLayout(new BorderLayout());
         left.setOpaque(false);
         left.add(instancesTable, BorderLayout.CENTER);
         left.add(updateControls, BorderLayout.PAGE_END);
@@ -73,7 +80,6 @@ public class RedditLauncherFrame extends LauncherFrame implements WindowFocusLis
         center.add(headerImage, BorderLayout.PAGE_START);
         center.add(launchControls, BorderLayout.PAGE_END);
 
-        JPanel root = new RedditBackgroundPanel("wallpapers/new", 7000L);
         root.setLayout(new BorderLayout());
         root.add(left, BorderLayout.WEST);
         root.add(center, BorderLayout.CENTER);
@@ -89,6 +95,18 @@ public class RedditLauncherFrame extends LauncherFrame implements WindowFocusLis
     @Override
     public void windowLostFocus(WindowEvent windowEvent) {
 
+    }
+
+    private String getSubReddit() {
+        String news = launcher.prop("newsUrl");
+        if (!news.contains("reddit.com")) {
+            news = "https://reddit.com/r/wallpapers/new.json";
+        }
+
+        if (!news.endsWith(".json")) {
+            news = news + ".json";
+        }
+        return news;
     }
 
     private void refreshBackgrounds() {

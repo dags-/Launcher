@@ -3,8 +3,6 @@ package com.skcraft.launcher.util;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.skcraft.launcher.util.Closer;
-import com.skcraft.launcher.util.HttpRequest;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
