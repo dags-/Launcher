@@ -241,6 +241,16 @@ public class LauncherFrame extends JFrame {
                         LauncherFrame.this, new File(selected.getContentDir(), "screenshots"), true));
                 popup.add(menuItem);
 
+                menuItem = new JMenuItem(SharedLocale.tr("instance.openLogs"));
+                menuItem.addActionListener(ActionListeners.browseDir(
+                        LauncherFrame.this, new File(selected.getContentDir(), "logs"), true));
+                popup.add(menuItem);
+
+                menuItem = new JMenuItem(SharedLocale.tr("instance.openCrashReports"));
+                menuItem.addActionListener(ActionListeners.browseDir(
+                        LauncherFrame.this, new File(selected.getContentDir(), "crash-reports"), true));
+                popup.add(menuItem);
+
                 menuItem = new JMenuItem(SharedLocale.tr("instance.copyAsPath"));
                 menuItem.addActionListener(new ActionListener() {
                     @Override
