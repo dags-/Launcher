@@ -9,15 +9,15 @@ package com.skcraft.launcher;
 import com.skcraft.launcher.dialog.LauncherFrame;
 import com.skcraft.launcher.swing.*;
 import lombok.NonNull;
+import lombok.extern.java.Log;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.Properties;
 
+@Log
 public class RedditLauncherFrame extends LauncherFrame {
 
-    private JPanel updateControls;
-    private Properties theme;
+    private static final Theme theme = new Theme();
 
     public RedditLauncherFrame(@NonNull final Launcher launcher) {
         super(launcher);
@@ -31,37 +31,26 @@ public class RedditLauncherFrame extends LauncherFrame {
 
     @Override
     public JButton createPrimaryButton(String name) {
-        Color unpressed = Color.decode(getTheme().getProperty("button.primary.color"));
-        Color pressed = Color.decode(getTheme().getProperty("button.primary.pressed.color"));
-        Color text = Color.decode(getTheme().getProperty("button.primary.text.color"));
-        int size = Integer.parseInt(getTheme().getProperty("button.primary.text.size"));
-        JButton button = new ColoredButton(name, unpressed, pressed);
-        button.setFont(new Font(button.getFont().getName(), Font.PLAIN, size));
-        button.setForeground(text);
+        JButton button = new ColoredButton(name, theme.primary, theme.primaryAlt);
+        button.setFont(new Font(button.getFont().getName(), Font.PLAIN, theme.primarySize));
+        button.setForeground(theme.primaryText);
         return button;
     }
 
     @Override
     protected JButton createSecondaryButton(String name) {
-        Color unpressed = Color.decode(getTheme().getProperty("button.secondary.color"));
-        Color pressed = Color.decode(getTheme().getProperty("button.secondary.pressed.color"));
-        Color text = Color.decode(getTheme().getProperty("button.secondary.text.color"));
-        int size = Integer.parseInt(getTheme().getProperty("button.secondary.text.size"));
-        JButton button = new ColoredButton(name, unpressed, pressed);
-        button.setFont(new Font(button.getFont().getName(), Font.PLAIN, size));
-        button.setForeground(text);
+        JButton button = new ColoredButton(name, theme.secondary, theme.secondaryAlt);
+        button.setFont(new Font(button.getFont().getName(), Font.PLAIN, theme.secondarySize));
+        button.setForeground(theme.secondaryText);
         return button;
     }
 
     @Override
     protected JCheckBox createCheckBox(String name) {
-        Color unpressed = Color.decode(getTheme().getProperty("button.secondary.color"));
-        Color text = Color.decode(getTheme().getProperty("button.secondary.text.color"));
-        int size = Integer.parseInt(getTheme().getProperty("button.secondary.text.size"));
         JCheckBox box = new JCheckBox(name);
-        box.setFont(new Font(box.getFont().getName(), Font.PLAIN, size));
-        box.setBackground(unpressed);
-        box.setForeground(text);
+        box.setFont(new Font(box.getFont().getName(), Font.PLAIN, theme.secondarySize));
+        box.setBackground(theme.secondary);
+        box.setForeground(theme.secondaryText);
         return box;
     }
 
@@ -70,30 +59,23 @@ public class RedditLauncherFrame extends LauncherFrame {
         super.initComponents();
         getContentPane().removeAll();
 
+        initInstanceTable();
+
         refreshButton.setPreferredSize(new Dimension(100, 30));
         updateCheck.setPreferredSize(new Dimension(100, 30));
         updateCheck.setHorizontalAlignment(SwingConstants.CENTER);
 
-        optionsButton.setPreferredSize(new Dimension(120, 40));
-        launchButton.setPreferredSize(new Dimension(120, 40));
+        selfUpdateButton.setPreferredSize(new Dimension(120, 50));
+        optionsButton.setPreferredSize(new Dimension(120, 50));
+        launchButton.setPreferredSize(new Dimension(120, 50));
 
         redditInit();
-        refreshBackgrounds();
     }
 
     private void redditInit() {
-        String address = String.format("https://reddit.com/r/%s.json", getTheme().getProperty("subbreddit"));
+        String address = String.format("https://reddit.com/r/%s.json", theme.subreddit);
+        log.info("Set reddit url " + address);
         RedditBackgroundPanel root = new RedditBackgroundPanel(address, 8000L);
-
-        JPanel launchControls = new JPanel();
-        launchControls.setOpaque(false);
-        launchControls.add(selfUpdateButton);
-        launchControls.add(optionsButton);
-        launchControls.add(launchButton);
-
-        updateControls = new JPanel();
-        updateControls.add(refreshButton);
-        updateControls.add(updateCheck);
 
         JLabel headerImage = new JLabel();
         Image image = SwingHelper.createImage(RedditLauncher.class, "/com/skcraft/launcher/header.png");
@@ -102,9 +84,20 @@ public class RedditLauncherFrame extends LauncherFrame {
             headerImage.setHorizontalAlignment(SwingConstants.RIGHT);
         }
 
-        JPanel left = new FrostPanel(root);
+        JPanel launchControls = new JPanel();
+        launchControls.setOpaque(false);
+        launchControls.add(selfUpdateButton);
+        launchControls.add(optionsButton);
+        launchControls.add(launchButton);
+
+        JPanel updateControls = new JPanel();
+        updateControls.add(refreshButton);
+        updateControls.add(updateCheck);
+
+        updateControls.setBackground(getFrostColorLigher(theme.frost));
+
+        JPanel left = new FrostPanel(root, theme.frost);
         left.setLayout(new BorderLayout());
-        left.setOpaque(false);
         left.add(instancesTable, BorderLayout.CENTER);
         left.add(updateControls, BorderLayout.PAGE_END);
 
@@ -121,35 +114,19 @@ public class RedditLauncherFrame extends LauncherFrame {
         add(root);
     }
 
-    private Properties getTheme() {
-        if (theme == null) {
-            Properties theme = new Properties();
-            try {
-                theme.load(RedditLauncherFrame.class.getResourceAsStream("/com/skcraft/launcher/theme.properties"));
-                this.theme = theme;
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        return theme;
+    private Color getFrostColorLigher(Color c) {
+        int r = Math.min(c.getRed() + 20, 255);
+        int g = Math.min(c.getGreen() + 20, 255);
+        int b = Math.min(c.getBlue() + 20, 255);
+        int a = Math.min(c.getAlpha() + 40, 255);
+        return new Color(r, g, b, a);
     }
 
-    private void refreshBackgrounds() {
-        Color background = Color.decode(getTheme().getProperty("list.background.color"));
-        int alpha = Math.round(256 * Float.parseFloat(getTheme().getProperty("list.background.alpha")));
-        alpha = Math.min(alpha, 255);
-
-        Color col1 = new Color(background.getRed(), background.getGreen(), background.getBlue(), alpha);
-        instancesTable.setBackground(col1);
-
-        int r = Math.min(background.getRed() + 20, 255);
-        int g = Math.min(background.getGreen() + 20, 255);
-        int b = Math.min(background.getBlue() + 20, 255);
-        int a = Math.min(alpha + 40, 255);
-
-        Color col2 = new Color(r, g, b, a);
-        updateControls.setBackground(col2);
-
-        repaint();
+    private void initInstanceTable() {
+        instancesTable.setSelectionBackground(theme.primary);
+        instancesTable.setSelectionForeground(theme.primaryText);
+        instancesTable.setForeground(theme.secondaryText);
+        instancesTable.setFont(new Font(instancesTable.getFont().getName(), Font.PLAIN, theme.secondarySize));
+        instancesTable.setOpaque(false);
     }
 }

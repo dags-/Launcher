@@ -27,6 +27,7 @@ public class RedditBackgroundPanel extends JPanel implements Runnable, ActionLis
 
     private final AtomicReference<ImageFader> reference;
     private final AtomicBoolean showing;
+    private final AtomicBoolean repaint;
     private final String address;
     private final Timer timer;
     private final long delay;
@@ -34,6 +35,7 @@ public class RedditBackgroundPanel extends JPanel implements Runnable, ActionLis
     public RedditBackgroundPanel(String address, long interval) {
         this.reference = new AtomicReference<ImageFader>(EMPTY);
         this.showing = new AtomicBoolean(true);
+        this.repaint = new AtomicBoolean(true);
         this.timer = new Timer(200, this);
         this.address = address;
         this.delay = interval;
@@ -54,7 +56,6 @@ public class RedditBackgroundPanel extends JPanel implements Runnable, ActionLis
     @Override
     public void paint(Graphics graphics) {
         super.paint(graphics);
-
         if (reference.get().isFading()) {
             repaint();
         }
@@ -62,8 +63,11 @@ public class RedditBackgroundPanel extends JPanel implements Runnable, ActionLis
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (this.isShowing()) {
-            repaint();
+        if (isShowing()) {
+            if (repaint.get()) {
+                repaint.set(false);
+                repaint();
+            }
         } else {
             timer.stop();
             showing.set(false);
@@ -83,6 +87,7 @@ public class RedditBackgroundPanel extends JPanel implements Runnable, ActionLis
 
                 if (image != null) {
                     reference.set(image);
+                    repaint.set(true);
                 }
 
                 if (++index >= targets.size()) {

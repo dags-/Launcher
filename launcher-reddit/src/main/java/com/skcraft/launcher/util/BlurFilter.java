@@ -44,6 +44,7 @@ public class BlurFilter {
         convolveAndTranspose(kernel, outPixels, inPixels, height, width, alpha, CLAMP_EDGES);
 
         dst.setRGB(0, 0, width, height, inPixels, 0, width);
+
         return dst;
     }
 

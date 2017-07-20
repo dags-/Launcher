@@ -13,23 +13,28 @@ public class FrostPanel extends JPanel {
 
     private final BlurFilter filter = new BlurFilter(10F);
     private final Paintable under;
-    private BufferedImage cached = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
+    private final Color color;
+    private Graphics cached = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB).createGraphics();
 
-    public FrostPanel(Paintable under) {
+    public FrostPanel(Paintable under, Color frostColor) {
         this.under = under;
+        this.color = frostColor;
     }
 
     @Override
     public void paintComponent(Graphics graphics) {
-        if (getWidth() != cached.getWidth() || getHeight() != cached.getHeight()) {
-            cached = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB);
+        if (color.getAlpha() < 250) {
+            BufferedImage image = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB);
+
+            Graphics g = image.createGraphics();
+            under.paintComponent(g);
+            g.dispose();
+
+            BufferedImage blurred = filter.filter(image, null);
+            graphics.drawImage(blurred, 0, 0, getWidth(), getHeight(), null);
         }
 
-        Graphics g = cached.createGraphics();
-        under.paintComponent(g);
-        g.dispose();
-
-        BufferedImage blurred = filter.filter(cached, null);
-        graphics.drawImage(blurred, 0, 0, getWidth(), getHeight(), Color.black, this);
+        graphics.setColor(color);
+        graphics.fillRect(0, 0, getWidth(), getHeight());
     }
 }
