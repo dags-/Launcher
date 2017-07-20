@@ -18,10 +18,12 @@ import java.awt.*;
 public class RedditLauncherFrame extends LauncherFrame {
 
     private static final Theme theme = new Theme();
+    private static final Dimension PRIM = new Dimension(125, 45);
+    private static final Dimension SEC = new Dimension(110, 30);
 
     public RedditLauncherFrame(@NonNull final Launcher launcher) {
         super(launcher);
-        setMinimumSize(new Dimension(700, 420));
+        setMinimumSize(new Dimension(720, 440));
     }
 
     @Override
@@ -34,6 +36,7 @@ public class RedditLauncherFrame extends LauncherFrame {
         JButton button = new ColoredButton(name, theme.primary, theme.primaryAlt);
         button.setFont(new Font(button.getFont().getName(), Font.PLAIN, theme.primarySize));
         button.setForeground(theme.primaryText);
+        button.setPreferredSize(PRIM);
         return button;
     }
 
@@ -42,6 +45,7 @@ public class RedditLauncherFrame extends LauncherFrame {
         JButton button = new ColoredButton(name, theme.secondary, theme.secondaryAlt);
         button.setFont(new Font(button.getFont().getName(), Font.PLAIN, theme.secondarySize));
         button.setForeground(theme.secondaryText);
+        button.setPreferredSize(SEC);
         return button;
     }
 
@@ -51,6 +55,8 @@ public class RedditLauncherFrame extends LauncherFrame {
         box.setFont(new Font(box.getFont().getName(), Font.PLAIN, theme.secondarySize));
         box.setBackground(theme.secondary);
         box.setForeground(theme.secondaryText);
+        box.setPreferredSize(SEC);
+        box.setHorizontalAlignment(SwingConstants.CENTER);
         return box;
     }
 
@@ -58,21 +64,11 @@ public class RedditLauncherFrame extends LauncherFrame {
     protected void initComponents() {
         super.initComponents();
         getContentPane().removeAll();
-
         instancesTable.setSelectionBackground(theme.primary);
         instancesTable.setSelectionForeground(theme.primaryText);
         instancesTable.setForeground(theme.secondaryText);
         instancesTable.setFont(new Font(instancesTable.getFont().getName(), Font.PLAIN, theme.secondarySize));
         instancesTable.setOpaque(false);
-
-        refreshButton.setPreferredSize(new Dimension(100, 30));
-        updateCheck.setPreferredSize(new Dimension(100, 30));
-        updateCheck.setHorizontalAlignment(SwingConstants.CENTER);
-
-        selfUpdateButton.setPreferredSize(new Dimension(120, 50));
-        optionsButton.setPreferredSize(new Dimension(120, 50));
-        launchButton.setPreferredSize(new Dimension(120, 50));
-
         redditInit();
     }
 
