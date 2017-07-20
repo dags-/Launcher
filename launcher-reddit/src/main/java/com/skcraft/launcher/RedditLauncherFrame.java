@@ -59,7 +59,11 @@ public class RedditLauncherFrame extends LauncherFrame {
         super.initComponents();
         getContentPane().removeAll();
 
-        initInstanceTable();
+        instancesTable.setSelectionBackground(theme.primary);
+        instancesTable.setSelectionForeground(theme.primaryText);
+        instancesTable.setForeground(theme.secondaryText);
+        instancesTable.setFont(new Font(instancesTable.getFont().getName(), Font.PLAIN, theme.secondarySize));
+        instancesTable.setOpaque(false);
 
         refreshButton.setPreferredSize(new Dimension(100, 30));
         updateCheck.setPreferredSize(new Dimension(100, 30));
@@ -77,13 +81,6 @@ public class RedditLauncherFrame extends LauncherFrame {
         log.info("Set reddit url " + address);
         RedditBackgroundPanel root = new RedditBackgroundPanel(address, 8000L);
 
-        JLabel headerImage = new JLabel();
-        Image image = SwingHelper.createImage(RedditLauncher.class, "/com/skcraft/launcher/header.png");
-        if (image != null) {
-            headerImage = new JLabel(new ImageIcon(image));
-            headerImage.setHorizontalAlignment(SwingConstants.RIGHT);
-        }
-
         JPanel launchControls = new JPanel();
         launchControls.setOpaque(false);
         launchControls.add(selfUpdateButton);
@@ -93,8 +90,7 @@ public class RedditLauncherFrame extends LauncherFrame {
         JPanel updateControls = new JPanel();
         updateControls.add(refreshButton);
         updateControls.add(updateCheck);
-
-        updateControls.setBackground(getFrostColorLigher(theme.frost));
+        updateControls.setBackground(getAltFrostColor(theme.frost));
 
         JPanel left = new FrostPanel(root, theme.frost);
         left.setLayout(new BorderLayout());
@@ -104,7 +100,7 @@ public class RedditLauncherFrame extends LauncherFrame {
         JPanel center = new JPanel();
         center.setOpaque(false);
         center.setLayout(new BorderLayout());
-        center.add(headerImage, BorderLayout.PAGE_START);
+        center.add(getHeaderImage(), BorderLayout.PAGE_START);
         center.add(launchControls, BorderLayout.PAGE_END);
 
         root.setLayout(new BorderLayout());
@@ -114,19 +110,21 @@ public class RedditLauncherFrame extends LauncherFrame {
         add(root);
     }
 
-    private Color getFrostColorLigher(Color c) {
+    private JLabel getHeaderImage() {
+        JLabel label = new JLabel();
+        Image image = SwingHelper.createImage(RedditLauncher.class, "/com/skcraft/launcher/header.png");
+        if (image != null) {
+            label = new JLabel(new ImageIcon(image));
+            label.setHorizontalAlignment(SwingConstants.RIGHT);
+        }
+        return label;
+    }
+
+    private Color getAltFrostColor(Color c) {
         int r = Math.min(c.getRed() + 20, 255);
         int g = Math.min(c.getGreen() + 20, 255);
         int b = Math.min(c.getBlue() + 20, 255);
         int a = Math.min(c.getAlpha() + 40, 255);
         return new Color(r, g, b, a);
-    }
-
-    private void initInstanceTable() {
-        instancesTable.setSelectionBackground(theme.primary);
-        instancesTable.setSelectionForeground(theme.primaryText);
-        instancesTable.setForeground(theme.secondaryText);
-        instancesTable.setFont(new Font(instancesTable.getFont().getName(), Font.PLAIN, theme.secondarySize));
-        instancesTable.setOpaque(false);
     }
 }
