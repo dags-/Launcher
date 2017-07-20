@@ -14,7 +14,6 @@ public class FrostPanel extends JPanel {
     private final BlurFilter filter = new BlurFilter(10F);
     private final Paintable under;
     private final Color color;
-    private Graphics cached = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB).createGraphics();
 
     public FrostPanel(Paintable under, Color frostColor) {
         this.under = under;

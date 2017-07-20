@@ -5,28 +5,23 @@ import java.awt.image.ColorModel;
 import java.awt.image.Kernel;
 
 /**
- * @author dags <dags@dags.me>
+ * Ref:
+ * http://www.jhlabs.com/ip/AbstractBufferedImageOp.java
+ * http://www.jhlabs.com/ip/ConvolveFilter.java
+ * http://www.jhlabs.com/ip/PixelUtils.java
+ * Copyright 2005 Huxtable.com. All rights reserved.
  */
 public class BlurFilter {
 
-    private static int CLAMP_EDGES = 1;
-    private static int WRAP_EDGES = 2;
+    private static final int CLAMP_EDGES = 1;
+    private static final int WRAP_EDGES = 2;
 
-    private boolean alpha = true;
-    private float radius;
-    private Kernel kernel;
-
-    public BlurFilter() {
-        this(2);
-    }
+    private final Kernel kernel;
+    private final boolean alpha;
 
     public BlurFilter(float radius) {
-        setRadius(radius);
-    }
-
-    private void setRadius(float radius) {
-        this.radius = radius;
-        kernel = makeKernel(radius);
+        this.kernel = makeKernel(radius);
+        this.alpha = true;
     }
 
     public BufferedImage filter(BufferedImage src, BufferedImage dst) {
@@ -89,10 +84,10 @@ public class BlurFilter {
                         b += f * (rgb & 0xff);
                     }
                 }
-                int ia = alpha ? PixelUtils.clamp((int) (a + 0.5)) : 0xff;
-                int ir = PixelUtils.clamp((int) (r + 0.5));
-                int ig = PixelUtils.clamp((int) (g + 0.5));
-                int ib = PixelUtils.clamp((int) (b + 0.5));
+                int ia = alpha ? clamp((int) (a + 0.5)) : 0xff;
+                int ir = clamp((int) (r + 0.5));
+                int ig = clamp((int) (g + 0.5));
+                int ib = clamp((int) (b + 0.5));
                 outPixels[index] = (ia << 24) | (ir << 16) | (ig << 8) | ib;
                 index += height;
             }
@@ -123,5 +118,13 @@ public class BlurFilter {
             matrix[i] /= total;
 
         return new Kernel(rows, 1, matrix);
+    }
+
+    private static int clamp(int c) {
+        if (c < 0)
+            return 0;
+        if (c > 255)
+            return 255;
+        return c;
     }
 }
