@@ -37,6 +37,7 @@ import java.io.FileFilter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.management.ManagementFactory;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Locale;
@@ -412,6 +413,16 @@ public final class Launcher {
      * @param args args
      */
     public static void main(final String[] args) {
+        Method main = getLauncher();
+        if (main != null) {
+            try {
+                main.invoke(null, (Object) args);
+                return;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
         setupLogger();
 
         SwingUtilities.invokeLater(new Runnable() {
@@ -432,4 +443,20 @@ public final class Launcher {
 
     }
 
+    private static Method getLauncher() {
+        String[] launchers = {"RedditLauncher", "FancyLauncher"};
+        for (String s : launchers) {
+            String path = String.format("com.skcraft.launcher.%s", s);
+            try {
+                Class<?> clazz = Class.forName(path);
+                Method main = clazz.getMethod("main", String[].class);
+                if (main != null) {
+                    return main;
+                }
+            } catch (Exception ignored) {
+                ignored.printStackTrace();
+            }
+        }
+        return null;
+    }
 }
