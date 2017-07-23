@@ -182,8 +182,9 @@ public class JavaRuntimeFetcher {
     }
 
     private void download(String url, File destination) {
-        if (destination.exists() && destination.delete()) {
-            log.log(Level.INFO, "Download destination already exists, deleting: {0}", destination);
+        if (destination.exists() && !destination.delete()) {
+            log.log(Level.INFO, "Unable to clean up existing file {0} before downloading", destination);
+            return;
         }
 
         int attempts = 0;
@@ -222,8 +223,8 @@ public class JavaRuntimeFetcher {
             throw new UnsupportedOperationException("Attempted to decompress non-existent file: " + lzma);
         }
 
-        if (zip.exists()) {
-            log.log(Level.INFO, "Zip destination already exists, skipping decompression: {0}", zip);
+        if (zip.exists() && !zip.delete()) {
+            log.log(Level.INFO, "Unable to clean up existing file {0} before unzipping", zip);
             return;
         }
 

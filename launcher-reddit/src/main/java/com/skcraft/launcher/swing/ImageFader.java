@@ -24,13 +24,10 @@ public class ImageFader implements ActionListener {
         this.to = to;
         this.duration = duration;
         this.start = System.currentTimeMillis();
+
         if (from != null && to != null) {
             timer.start();
         }
-    }
-
-    public BufferedImage getFrom() {
-        return from;
     }
 
     public BufferedImage getTo() {
@@ -47,7 +44,7 @@ public class ImageFader implements ActionListener {
         g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 
         if (isFading() && from != null) {
-            g.setComposite(AlphaComposite.SrcOver.derive(1F - alpha));
+            g.setComposite(AlphaComposite.SrcOver.derive(1f - alpha));
             drawScaled(g, parent, from, windowWidth, windowHeight);
             g.setComposite(AlphaComposite.SrcOver.derive(alpha));
         }
@@ -76,7 +73,6 @@ public class ImageFader implements ActionListener {
         return Math.max(scaled, windowDim);
     }
 
-    @Override
     public void actionPerformed(ActionEvent actionEvent) {
         float time = System.currentTimeMillis() - start;
 

@@ -14,10 +14,9 @@ import java.util.List;
 /**
  * @author dags <dags@dags.me>
  */
-public class RedditImageScraper implements BackgroundProvider {
+public class RedditUtils {
 
-    @Override
-    public List<String> getBackgrounds(String address) {
+    public static List<String> getBackgrounds(String address) {
         HttpRequest request = null;
 
         try {
@@ -38,10 +37,11 @@ public class RedditImageScraper implements BackgroundProvider {
         } finally {
             Closer.close(request);
         }
+
         return Collections.emptyList();
     }
 
-    private void visit(JsonNode data, List<String> collector, int limit) {
+    private static void visit(JsonNode data, List<String> collector, int limit) {
         if (data.has("children")) {
             JsonNode children = data.get("children");
             for (JsonNode child : children) {
@@ -55,7 +55,7 @@ public class RedditImageScraper implements BackgroundProvider {
         }
     }
 
-    private void visitChild(JsonNode data, List<String> collector) {
+    private static void visitChild(JsonNode data, List<String> collector) {
         // ignore videos/albums
         if (data.has("media_embed") && data.get("media_embed").size() > 0) {
             return;
@@ -70,8 +70,10 @@ public class RedditImageScraper implements BackgroundProvider {
                         JsonNode source = image.get("source");
                         if (source.has("url")) {
                             String url = source.get("url").asText();
-                            collector.add(url);
-                            return;
+                            if (!url.contains(".gif")) {
+                                collector.add(url);
+                                return;
+                            }
                         }
                     }
                 }

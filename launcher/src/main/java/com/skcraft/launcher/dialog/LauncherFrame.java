@@ -10,14 +10,17 @@ import com.skcraft.concurrency.ObservableFuture;
 import com.skcraft.launcher.Instance;
 import com.skcraft.launcher.InstanceList;
 import com.skcraft.launcher.Launcher;
+import com.skcraft.launcher.LauncherUtils;
 import com.skcraft.launcher.launch.LaunchListener;
 import com.skcraft.launcher.launch.LaunchOptions;
 import com.skcraft.launcher.launch.LaunchOptions.UpdatePolicy;
 import com.skcraft.launcher.swing.*;
-import com.skcraft.launcher.util.*;
+import com.skcraft.launcher.util.SharedLocale;
+import com.skcraft.launcher.util.SwingExecutor;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.extern.java.Log;
+import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
 import javax.swing.event.TableModelEvent;
@@ -29,9 +32,9 @@ import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.io.IOException;
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedList;
 
 import static com.skcraft.launcher.util.SharedLocale.tr;
 
@@ -41,19 +44,20 @@ import static com.skcraft.launcher.util.SharedLocale.tr;
 @Log
 public class LauncherFrame extends JFrame {
 
-    private final Launcher launcher;
+    protected final Launcher launcher;
 
-    private final Color transparent = new Color(0, 0, 0, 0);
     @Getter
-    private final InstanceTable instancesTable = new InstanceTable();
+    protected final InstanceTable instancesTable = new InstanceTable();
+    protected final InstanceTableModel instancesModel;
     @Getter
-    private final JScrollPane instanceScroll = new JScrollPane(instancesTable);
-    private final InstanceTableModel instancesModel;
-    private final JButton launchButton = createButton(SharedLocale.tr("launcher.launch"));
-    private final JButton refreshButton = createButton(SharedLocale.tr("launcher.checkForUpdates"));
-    private final JButton optionsButton = createButton(SharedLocale.tr("launcher.options"));
-    private final JButton selfUpdateButton = createButton(SharedLocale.tr("launcher.updateLauncher"));
-    private final JCheckBox updateCheck = new JCheckBox(SharedLocale.tr("launcher.downloadUpdates"));
+    protected final JScrollPane instanceScroll = new JScrollPane(instancesTable);
+    protected WebpagePanel webView;
+    protected JSplitPane splitPane;
+    protected final JButton launchButton = createPrimaryButton(SharedLocale.tr("launcher.launch"));
+    protected final JButton refreshButton = createSecondaryButton(SharedLocale.tr("launcher.checkForUpdates"));
+    protected final JButton optionsButton = createPrimaryButton(SharedLocale.tr("launcher.options"));
+    protected final JButton selfUpdateButton = createPrimaryButton(SharedLocale.tr("launcher.updateLauncher"));
+    protected final JCheckBox updateCheck = createCheckBox(SharedLocale.tr("launcher.downloadUpdates"));
 
     /**
      * Create a new frame.
@@ -62,26 +66,16 @@ public class LauncherFrame extends JFrame {
      */
     public LauncherFrame(@NonNull Launcher launcher) {
         super(tr("launcher.title", launcher.getVersion()));
-
         this.launcher = launcher;
         instancesModel = new InstanceTableModel(launcher.getInstances());
 
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        setMinimumSize(new Dimension(720, 420));
+        setMinimumSize(new Dimension(400, 300));
         initComponents();
         pack();
         setLocationRelativeTo(null);
 
-        Image mainIcon = SwingHelper.createImage(LauncherFrame.class, "/com/skcraft/launcher/icon.png");
-        Image titleIcon = SwingHelper.createImage(LauncherFrame.class, "/com/skcraft/launcher/title.png");
-        List<Image> icons = new ArrayList<Image>();
-        if (mainIcon != null) {
-            icons.add(mainIcon);
-        }
-        if (titleIcon != null) {
-            icons.add(titleIcon.getScaledInstance(16, 16, Image.SCALE_SMOOTH));
-        }
-        this.setIconImages(icons);
+        SwingHelper.setFrameIcon(this, Launcher.class, "icon.png");
 
         SwingUtilities.invokeLater(new Runnable() {
             @Override
@@ -91,35 +85,12 @@ public class LauncherFrame extends JFrame {
         });
     }
 
-    private JButton createButton(String label) {
-        JButton button = new JButton(label);
-        button.setBorderPainted(false);
-        button.setOpaque(true);
-        return button;
-    }
-
-    private JPanel loadLogo() {
-        JPanel panel = new JPanel();
-        panel.setOpaque(false);
-        panel.setBackground(transparent);
-        panel.setLayout(new BorderLayout());
-
-        Image image = SwingHelper.readBufferedImage(LauncherFrame.class,  "/com/skcraft/launcher/header.png");
-        if (image != null) {
-            ImageIcon icon = new ImageIcon(image);
-            JLabel label = new JLabel(icon);
-            panel.add(label, BorderLayout.LINE_END);
-            return panel;
-        }
-
-        return panel;
-    }
-
-    private void initComponents() {
+    protected void initComponents() {
         JPanel container = createContainerPanel();
-        container.setBackground(transparent);
-        container.setLayout(new BorderLayout());
+        container.setLayout(new MigLayout("fill, insets dialog", "[][]push[][]", "[grow][]"));
 
+        webView = createNewsPanel();
+        splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, instanceScroll, webView);
         selfUpdateButton.setVisible(launcher.getUpdateManager().getPendingUpdate());
 
         launcher.getUpdateManager().addPropertyChangeListener(new PropertyChangeListener() {
@@ -127,55 +98,26 @@ public class LauncherFrame extends JFrame {
             public void propertyChange(PropertyChangeEvent evt) {
                 if (evt.getPropertyName().equals("pendingUpdate")) {
                     selfUpdateButton.setVisible((Boolean) evt.getNewValue());
+
                 }
             }
         });
 
         updateCheck.setSelected(true);
-        updateCheck.setHorizontalAlignment(SwingConstants.CENTER);
         instancesTable.setModel(instancesModel);
-        selfUpdateButton.setPreferredSize(new Dimension(125, 40));
-        optionsButton.setPreferredSize(new Dimension(125, 40));
-        launchButton.setPreferredSize(new Dimension(125, 40));
-        refreshButton.setPreferredSize(new Dimension(125, 30));
         launchButton.setFont(launchButton.getFont().deriveFont(Font.BOLD));
-
-        JPanel updateControls = new JPanel();
-        updateControls.setLayout(new GridLayout());
-        updateControls.add(refreshButton);
-        updateControls.add(updateCheck);
-
-        JPanel launchControls = new JPanel();
-        launchControls.setBackground(transparent);
-        launchControls.add(selfUpdateButton);
-        launchControls.add(optionsButton);
-        launchControls.add(launchButton);
-
-        JPanel left = new JPanel();
-        left.setOpaque(false);
-        left.setBackground(transparent);
-        left.setLayout(new BorderLayout());
-        left.add(instancesTable, BorderLayout.CENTER);
-        left.add(updateControls, BorderLayout.PAGE_END);
-
-        JPanel right = new JPanel();
-        right.setOpaque(false);
-        right.setBackground(transparent);
-        right.setLayout(new BorderLayout());
-        right.add(loadLogo(), BorderLayout.PAGE_START);
-        right.add(launchControls, BorderLayout.PAGE_END);
-
-        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, left, right);
-        splitPane.setDividerLocation(250);
+        splitPane.setDividerLocation(200);
         splitPane.setDividerSize(4);
-        splitPane.setBackground(transparent);
-        container.add(splitPane, BorderLayout.CENTER);
+        splitPane.setOpaque(false);
+        container.add(splitPane, "grow, wrap, span 5, gapbottom unrel, w null:680, h null:350");
         SwingHelper.flattenJSplitPane(splitPane);
+        container.add(refreshButton);
+        container.add(updateCheck);
+        container.add(selfUpdateButton);
+        container.add(optionsButton);
+        container.add(launchButton);
 
-        add(container, BorderLayout.CENTER);
-
-        instancesTable.setBackground(new Color(255, 255, 255 ,128));
-        instancesTable.addMouseListener(new DoubleClickToButtonAdapter(launchButton));
+        add(container);
 
         instancesModel.addTableModelListener(new TableModelListener() {
             @Override
@@ -186,11 +128,14 @@ public class LauncherFrame extends JFrame {
             }
         });
 
+        instancesTable.addMouseListener(new DoubleClickToButtonAdapter(launchButton));
+
         refreshButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 loadInstances();
                 launcher.getUpdateManager().checkForUpdate();
+                webView.browse(launcher.getNewsURL(), false);
             }
         });
 
@@ -230,7 +175,19 @@ public class LauncherFrame extends JFrame {
     }
 
     protected JPanel createContainerPanel() {
-        return new BackgroundPanel(getBackgroundURLs(), 8000L);
+        return new JPanel();
+    }
+
+    protected JButton createPrimaryButton(String name) {
+        return new JButton(name);
+    }
+
+    protected JButton createSecondaryButton(String name) {
+        return new JButton(name);
+    }
+
+    protected JCheckBox createCheckBox(String name) {
+        return new JCheckBox(name);
     }
 
     /**
@@ -246,9 +203,9 @@ public class LauncherFrame extends JFrame {
      * Popup the menu for the instances.
      *
      * @param component the component
-     * @param x         mouse X
-     * @param y         mouse Y
-     * @param selected  the selected instance, possibly null
+     * @param x mouse X
+     * @param y mouse Y
+     * @param selected the selected instance, possibly null
      */
     private void popupInstanceMenu(Component component, int x, int y, final Instance selected) {
         JPopupMenu popup = new JPopupMenu();
@@ -285,6 +242,16 @@ public class LauncherFrame extends JFrame {
                 menuItem = new JMenuItem(SharedLocale.tr("instance.openScreenshots"));
                 menuItem.addActionListener(ActionListeners.browseDir(
                         LauncherFrame.this, new File(selected.getContentDir(), "screenshots"), true));
+                popup.add(menuItem);
+
+                menuItem = new JMenuItem(SharedLocale.tr("instance.openLogs"));
+                menuItem.addActionListener(ActionListeners.browseDir(
+                        LauncherFrame.this, new File(selected.getContentDir(), "logs"), true));
+                popup.add(menuItem);
+
+                menuItem = new JMenuItem(SharedLocale.tr("instance.openCrashReports"));
+                menuItem.addActionListener(ActionListeners.browseDir(
+                        LauncherFrame.this, new File(selected.getContentDir(), "crash-reports"), true));
                 popup.add(menuItem);
 
                 menuItem = new JMenuItem(SharedLocale.tr("instance.copyAsPath"));
@@ -344,6 +311,15 @@ public class LauncherFrame extends JFrame {
         });
         popup.add(menuItem);
 
+        menuItem = new JMenuItem(SharedLocale.tr("launcher.deleteRuntime"));
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                confirmDeleteRuntime();
+            }
+        });
+        popup.add(menuItem);
+
         popup.show(component, x, y);
 
     }
@@ -363,6 +339,31 @@ public class LauncherFrame extends JFrame {
                 loadInstances();
             }
         }, SwingExecutor.INSTANCE);
+    }
+
+    private void confirmDeleteRuntime() {
+        if (!SwingHelper.confirmDialog(this,
+                tr("launcher.confirmDeleteRuntime"), SharedLocale.tr("confirmTitle"))) {
+            return;
+        }
+
+        final File runtime = new File(launcher.getBaseDir(), "runtime");
+        if (runtime.exists()) {
+            Runnable task = new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        LauncherUtils.interruptibleDelete(runtime, new LinkedList<File>());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            };
+
+            SwingExecutor.INSTANCE.submit(task);
+        }
     }
 
     private void confirmHardUpdate(Instance instance) {
@@ -406,8 +407,6 @@ public class LauncherFrame extends JFrame {
     }
 
     private void launch() {
-        ConsoleFrame.initMessages();
-
         boolean permitUpdate = updateCheck.isSelected();
         Instance instance = launcher.getInstances().get(instancesTable.getSelectedRow());
 
@@ -420,21 +419,7 @@ public class LauncherFrame extends JFrame {
         launcher.getLaunchSupervisor().launch(options);
     }
 
-    private List<String> getBackgroundURLs() {
-        String address = launcher.getProperties().getProperty("backgroundsUrl");
-        BackgroundProvider provider = getProvider(address);
-        return provider.getBackgrounds(address);
-    }
-
-    private BackgroundProvider getProvider(String url) {
-        if (url.toLowerCase().contains("reddit.com/r/")) {
-            return new RedditImageScraper();
-        }
-        return new JsonImageScraper();
-    }
-
     private static class LaunchListenerImpl implements LaunchListener {
-
         private final WeakReference<LauncherFrame> frameRef;
         private final Launcher launcher;
 
@@ -461,11 +446,7 @@ public class LauncherFrame extends JFrame {
 
         @Override
         public void gameClosed() {
-            // user may have cancelled the launch process before gameStarted() is called
-            LauncherFrame frame = frameRef.get();
-            if (frame != null) {
-                frame.dispose();
-            }
+            gameStarted();
             launcher.showLauncherWindow();
         }
     }
