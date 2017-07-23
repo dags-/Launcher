@@ -18,7 +18,7 @@ import java.awt.*;
 public class RedditLauncherFrame extends LauncherFrame {
 
     private static final Theme theme = new Theme();
-    private static final Dimension PRIM = new Dimension(125, 45);
+    private static final Dimension PRIM = new Dimension(125, 55);
     private static final Dimension SEC = new Dimension(110, 30);
 
     public RedditLauncherFrame(@NonNull final Launcher launcher) {

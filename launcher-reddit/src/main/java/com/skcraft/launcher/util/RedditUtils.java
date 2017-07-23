@@ -70,8 +70,10 @@ public class RedditUtils {
                         JsonNode source = image.get("source");
                         if (source.has("url")) {
                             String url = source.get("url").asText();
-                            collector.add(url);
-                            return;
+                            if (!url.contains(".gif")) {
+                                collector.add(url);
+                                return;
+                            }
                         }
                     }
                 }
