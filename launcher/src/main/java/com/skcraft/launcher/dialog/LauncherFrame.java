@@ -10,6 +10,7 @@ import com.skcraft.concurrency.ObservableFuture;
 import com.skcraft.launcher.Instance;
 import com.skcraft.launcher.InstanceList;
 import com.skcraft.launcher.Launcher;
+import com.skcraft.launcher.LauncherUtils;
 import com.skcraft.launcher.launch.LaunchListener;
 import com.skcraft.launcher.launch.LaunchOptions;
 import com.skcraft.launcher.launch.LaunchOptions.UpdatePolicy;
@@ -31,7 +32,9 @@ import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.util.LinkedList;
 
 import static com.skcraft.launcher.util.SharedLocale.tr;
 
@@ -308,6 +311,15 @@ public class LauncherFrame extends JFrame {
         });
         popup.add(menuItem);
 
+        menuItem = new JMenuItem(SharedLocale.tr("launcher.deleteRuntime"));
+        menuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                confirmDeleteRuntime();
+            }
+        });
+        popup.add(menuItem);
+
         popup.show(component, x, y);
 
     }
@@ -327,6 +339,31 @@ public class LauncherFrame extends JFrame {
                 loadInstances();
             }
         }, SwingExecutor.INSTANCE);
+    }
+
+    private void confirmDeleteRuntime() {
+        if (!SwingHelper.confirmDialog(this,
+                tr("launcher.confirmDeleteRuntime"), SharedLocale.tr("confirmTitle"))) {
+            return;
+        }
+
+        final File runtime = new File(launcher.getBaseDir(), "runtime");
+        if (runtime.exists()) {
+            Runnable task = new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        LauncherUtils.interruptibleDelete(runtime, new LinkedList<File>());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            };
+
+            SwingExecutor.INSTANCE.submit(task);
+        }
     }
 
     private void confirmHardUpdate(Instance instance) {
