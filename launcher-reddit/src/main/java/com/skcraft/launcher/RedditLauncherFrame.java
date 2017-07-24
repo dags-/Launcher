@@ -13,12 +13,14 @@ import lombok.extern.java.Log;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 
 @Log
 public class RedditLauncherFrame extends LauncherFrame {
 
     public RedditLauncherFrame(@NonNull final Launcher launcher) {
         super(launcher);
+        setIcons();
         setMinimumSize(new Dimension(720, 440));
     }
 
@@ -100,6 +102,19 @@ public class RedditLauncherFrame extends LauncherFrame {
         root.add(center, BorderLayout.CENTER);
 
         add(root);
+    }
+
+    private void setIcons() {
+        Image mainIcon = SwingHelper.createImage(LauncherFrame.class, "/com/skcraft/launcher/icon.png");
+        Image titleIcon = SwingHelper.createImage(LauncherFrame.class, "/com/skcraft/launcher/title.png");
+        ArrayList<Image> icons = new ArrayList<Image>();
+        if (mainIcon != null) {
+            icons.add(mainIcon);
+        }
+        if (titleIcon != null) {
+            icons.add(titleIcon.getScaledInstance(16, 16, Image.SCALE_SMOOTH));
+        }
+        setIconImages(icons);
     }
 
     private JLabel getHeaderImage() {
