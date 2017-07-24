@@ -10,6 +10,7 @@ import java.util.Properties;
 public class Theme {
 
     public static final String subreddit;
+    public static final boolean randomise;
     public static final Color primary;
     public static final Color primaryAlt;
     public static final Color primaryText;
@@ -24,6 +25,7 @@ public class Theme {
 
     static  {
         String _subreddit = "";
+        boolean _randomise = false;
         Color _primary = Color.white;
         Color _primaryAlt = Color.white;
         Color _primaryText = Color.white;
@@ -42,6 +44,7 @@ public class Theme {
         try {
             p.load(Theme.class.getResourceAsStream("/com/skcraft/launcher/theme.properties"));
             _subreddit = p.getProperty("subreddit");
+            _randomise = Boolean.parseBoolean(p.getProperty("randomise"));
 
             _primary = Color.decode(p.getProperty("primary.color"));
             _primaryAlt = Color.decode(p.getProperty("primary.color.alt"));
@@ -66,6 +69,7 @@ public class Theme {
         }
 
         subreddit = _subreddit;
+        randomise = _randomise;
         primary = _primary;
         primaryAlt = _primaryAlt;
         primaryText = _primaryText;

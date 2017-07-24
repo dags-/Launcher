@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
@@ -29,15 +30,17 @@ public class RedditBackgroundPanel extends JPanel implements Runnable, ActionLis
     private final AtomicBoolean showing;
     private final AtomicBoolean repaint;
     private final String address;
+    private final boolean random;
     private final Timer timer;
     private final long delay;
 
-    public RedditBackgroundPanel(String address, long interval) {
+    public RedditBackgroundPanel(String address, long interval, boolean randomise) {
         this.reference = new AtomicReference<ImageFader>(EMPTY);
         this.showing = new AtomicBoolean(true);
         this.repaint = new AtomicBoolean(true);
         this.timer = new Timer(200, this);
         this.address = address;
+        this.random = randomise;
         this.delay = interval;
         this.timer.start();
 
@@ -78,6 +81,10 @@ public class RedditBackgroundPanel extends JPanel implements Runnable, ActionLis
     public void run() {
         int index = 0;
         List<String> targets = RedditUtils.getBackgrounds(address);
+
+        if (random) {
+            Collections.shuffle(targets);
+        }
 
         // async
         while (showing.get() && index < targets.size()) {

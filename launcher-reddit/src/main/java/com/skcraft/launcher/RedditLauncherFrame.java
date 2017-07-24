@@ -73,7 +73,7 @@ public class RedditLauncherFrame extends LauncherFrame {
     private void redditInit() {
         String address = String.format("https://reddit.com/r/%s.json", Theme.subreddit);
         log.info("Set reddit url " + address);
-        RedditBackgroundPanel root = new RedditBackgroundPanel(address, 8000L);
+        RedditBackgroundPanel root = new RedditBackgroundPanel(address, 8000L, Theme.randomise);
 
         JPanel launchControls = new JPanel();
         launchControls.setOpaque(false);
