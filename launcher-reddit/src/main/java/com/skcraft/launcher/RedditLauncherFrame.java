@@ -17,10 +17,6 @@ import java.awt.*;
 @Log
 public class RedditLauncherFrame extends LauncherFrame {
 
-    private static final Theme theme = new Theme();
-    private static final Dimension PRIM = new Dimension(125, 55);
-    private static final Dimension SEC = new Dimension(110, 30);
-
     public RedditLauncherFrame(@NonNull final Launcher launcher) {
         super(launcher);
         setMinimumSize(new Dimension(720, 440));
@@ -33,29 +29,29 @@ public class RedditLauncherFrame extends LauncherFrame {
 
     @Override
     public JButton createPrimaryButton(String name) {
-        JButton button = new ColoredButton(name, theme.primary, theme.primaryAlt);
-        button.setFont(new Font(button.getFont().getName(), Font.PLAIN, theme.primarySize));
-        button.setForeground(theme.primaryText);
-        button.setPreferredSize(PRIM);
+        JButton button = new ColoredButton(name, Theme.primary, Theme.primaryAlt);
+        button.setFont(new Font(button.getFont().getName(), Font.PLAIN, Theme.primarySize));
+        button.setForeground(Theme.primaryText);
+        button.setPreferredSize(Theme.primaryButtonSize);
         return button;
     }
 
     @Override
     protected JButton createSecondaryButton(String name) {
-        JButton button = new ColoredButton(name, theme.secondary, theme.secondaryAlt);
-        button.setFont(new Font(button.getFont().getName(), Font.PLAIN, theme.secondarySize));
-        button.setForeground(theme.secondaryText);
-        button.setPreferredSize(SEC);
+        JButton button = new ColoredButton(name, Theme.secondary, Theme.secondaryAlt);
+        button.setFont(new Font(button.getFont().getName(), Font.PLAIN, Theme.secondarySize));
+        button.setForeground(Theme.secondaryText);
+        button.setPreferredSize(Theme.secondaryButtonSize);
         return button;
     }
 
     @Override
     protected JCheckBox createCheckBox(String name) {
         JCheckBox box = new JCheckBox(name);
-        box.setFont(new Font(box.getFont().getName(), Font.PLAIN, theme.secondarySize));
-        box.setBackground(theme.secondary);
-        box.setForeground(theme.secondaryText);
-        box.setPreferredSize(SEC);
+        box.setFont(new Font(box.getFont().getName(), Font.PLAIN, Theme.secondarySize));
+        box.setBackground(Theme.secondary);
+        box.setForeground(Theme.secondaryText);
+        box.setPreferredSize(Theme.secondaryButtonSize);
         box.setHorizontalAlignment(SwingConstants.CENTER);
         return box;
     }
@@ -64,16 +60,16 @@ public class RedditLauncherFrame extends LauncherFrame {
     protected void initComponents() {
         super.initComponents();
         getContentPane().removeAll();
-        instancesTable.setSelectionBackground(theme.primary);
-        instancesTable.setSelectionForeground(theme.primaryText);
-        instancesTable.setForeground(theme.secondaryText);
-        instancesTable.setFont(new Font(instancesTable.getFont().getName(), Font.PLAIN, theme.secondarySize));
+        instancesTable.setSelectionBackground(Theme.primary);
+        instancesTable.setSelectionForeground(Theme.primaryText);
+        instancesTable.setForeground(Theme.secondaryText);
+        instancesTable.setFont(new Font(instancesTable.getFont().getName(), Font.PLAIN, Theme.secondarySize));
         instancesTable.setOpaque(false);
         redditInit();
     }
 
     private void redditInit() {
-        String address = String.format("https://reddit.com/r/%s.json", theme.subreddit);
+        String address = String.format("https://reddit.com/r/%s.json", Theme.subreddit);
         log.info("Set reddit url " + address);
         RedditBackgroundPanel root = new RedditBackgroundPanel(address, 8000L);
 
@@ -86,9 +82,9 @@ public class RedditLauncherFrame extends LauncherFrame {
         JPanel updateControls = new JPanel();
         updateControls.add(refreshButton);
         updateControls.add(updateCheck);
-        updateControls.setBackground(getAltFrostColor(theme.frost));
+        updateControls.setBackground(getAltFrostColor(Theme.frost));
 
-        JPanel left = new FrostPanel(root, theme.frost);
+        JPanel left = new FrostPanel(root, Theme.frost);
         left.setLayout(new BorderLayout());
         left.add(instancesTable, BorderLayout.CENTER);
         left.add(updateControls, BorderLayout.PAGE_END);

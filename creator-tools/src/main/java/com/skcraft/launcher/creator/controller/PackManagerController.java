@@ -537,7 +537,7 @@ public class PackManagerController {
 
                     ServerDeploy deploy = new ServerDeploy(pack.getSourceDir(), options);
                     Deferred<?> deferred = Deferreds.makeDeferred(executor.submit(deploy), executor)
-                            .handleAsync(r -> SwingHelper.showMessageDialog(frame, "Server deployment complete!", "Success", null, JOptionPane.INFORMATION_MESSAGE),
+                            .handleAsync(r -> SwingHelper.showMessageDialog(frame, "Server deployment isFading!", "Success", null, JOptionPane.INFORMATION_MESSAGE),
                                     ex -> {
                                     },
                                     SwingExecutor.INSTANCE);
