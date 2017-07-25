@@ -11,8 +11,11 @@ import com.skcraft.launcher.swing.*;
 import lombok.NonNull;
 import lombok.extern.java.Log;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.ArrayList;
 
 @Log
@@ -119,10 +122,13 @@ public class RedditLauncherFrame extends LauncherFrame {
 
     private JLabel getHeaderImage() {
         JLabel label = new JLabel();
-        Image image = SwingHelper.createImage(RedditLauncher.class, "/com/skcraft/launcher/header.png");
-        if (image != null) {
-            label = new JLabel(new ImageIcon(image));
+        try {
+            BufferedImage image = ImageIO.read(RedditLauncher.class.getResourceAsStream("/com/skcraft/launcher/header.png"));
+            int width = Math.min(image.getWidth(), 350);
+            label.setIcon(new ImageIcon(image.getScaledInstance(width, -1, Image.SCALE_SMOOTH)));
             label.setHorizontalAlignment(SwingConstants.RIGHT);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         return label;
     }
