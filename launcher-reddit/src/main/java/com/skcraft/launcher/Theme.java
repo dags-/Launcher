@@ -10,6 +10,9 @@ import java.util.Properties;
 public class Theme {
 
     public static final String subreddit;
+    public static final int postCount;
+    public static final long interval;
+    public static final long fade;
     public static final boolean randomise;
     public static final Color primary;
     public static final Color primaryAlt;
@@ -25,6 +28,9 @@ public class Theme {
 
     static  {
         String _subreddit = "";
+        int _postCount = 25;
+        long _interval = 8000L;
+        long _fade = 1000L;
         boolean _randomise = false;
         Color _primary = Color.white;
         Color _primaryAlt = Color.white;
@@ -44,6 +50,9 @@ public class Theme {
         try {
             p.load(Theme.class.getResourceAsStream("/com/skcraft/launcher/theme.properties"));
             _subreddit = p.getProperty("subreddit");
+            _postCount = Integer.parseInt(p.getProperty("subreddit.posts"));
+            _interval = Long.parseLong(p.getProperty("interval"));
+            _fade = Long.parseLong(p.getProperty("fade"));
             _randomise = Boolean.parseBoolean(p.getProperty("randomise"));
 
             _primary = Color.decode(p.getProperty("primary.color"));
@@ -69,6 +78,9 @@ public class Theme {
         }
 
         subreddit = _subreddit;
+        postCount = _postCount;
+        interval = Math.max(_interval, 2000L);
+        fade = Math.max(_fade, 1000L);
         randomise = _randomise;
         primary = _primary;
         primaryAlt = _primaryAlt;

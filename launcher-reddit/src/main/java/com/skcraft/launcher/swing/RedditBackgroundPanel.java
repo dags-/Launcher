@@ -2,6 +2,7 @@ package com.skcraft.launcher.swing;
 
 import com.skcraft.launcher.util.Closer;
 import com.skcraft.launcher.util.RedditUtils;
+import lombok.extern.java.Log;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -22,6 +23,7 @@ import java.util.concurrent.atomic.AtomicReference;
 /**
  * @author dags <dags@dags.me>
  */
+@Log
 public class RedditBackgroundPanel extends JPanel implements Runnable, ActionListener, Paintable {
 
     private static final ImageFader EMPTY = getEmptyFader();
@@ -29,21 +31,24 @@ public class RedditBackgroundPanel extends JPanel implements Runnable, ActionLis
     private final AtomicReference<ImageFader> reference;
     private final AtomicBoolean showing;
     private final AtomicBoolean repaint;
-    private final String address;
+    private final String subreddit;
+    private final int postCount;
     private final boolean random;
     private final Timer timer;
     private final long delay;
+    private final long fade;
 
-    public RedditBackgroundPanel(String address, long interval, boolean randomise) {
+    public RedditBackgroundPanel(String subreddit, int postCount, boolean randomise, long interval, long fade) {
         this.reference = new AtomicReference<ImageFader>(EMPTY);
         this.showing = new AtomicBoolean(true);
         this.repaint = new AtomicBoolean(true);
         this.timer = new Timer(200, this);
-        this.address = address;
+        this.subreddit = subreddit;
+        this.postCount = postCount;
         this.random = randomise;
         this.delay = interval;
+        this.fade = fade;
         this.timer.start();
-
         Thread thread = new Thread(this);
         thread.setDaemon(true);
         thread.start();
@@ -79,9 +84,12 @@ public class RedditBackgroundPanel extends JPanel implements Runnable, ActionLis
 
     @Override
     public void run() {
-        int index = 0;
-        List<String> targets = RedditUtils.getBackgrounds(address);
+        log.info(String.format("Fetching backgrounds from subreddit: %s", subreddit));
 
+        int index = 0;
+        List<String> targets = RedditUtils.getBackgrounds(subreddit, postCount);
+
+        log.info(String.format("Found %s/%s backgrounds for subreddit: %s", targets.size(), postCount, subreddit));
         if (random) {
             Collections.shuffle(targets);
         }
@@ -106,6 +114,8 @@ public class RedditBackgroundPanel extends JPanel implements Runnable, ActionLis
                 e.printStackTrace();
             }
         }
+
+        log.info("Stopping async background image loader thread...");
     }
 
     private ImageFader getImage(String address) {
@@ -117,7 +127,7 @@ public class RedditBackgroundPanel extends JPanel implements Runnable, ActionLis
             URLConnection connection = url.openConnection();
             inputStream = connection.getInputStream();
             BufferedImage to = ImageIO.read(inputStream);
-            return new ImageFader(from, to, 1000L);
+            return new ImageFader(from, to, fade);
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -130,6 +140,6 @@ public class RedditBackgroundPanel extends JPanel implements Runnable, ActionLis
 
     private static ImageFader getEmptyFader() {
         BufferedImage blank = new BufferedImage(720, 480, BufferedImage.TYPE_INT_RGB);
-        return new ImageFader(blank, blank, 1000);
+        return new ImageFader(blank, blank, 1000L);
     }
 }

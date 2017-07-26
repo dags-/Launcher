@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -16,18 +15,39 @@ import java.util.List;
  */
 public class RedditUtils {
 
-    public static List<String> getBackgrounds(String address) {
-        HttpRequest request = null;
+    private static final String API = "https://reddit.com/r/%s.json?count=25&after=%s";
 
+    public static List<String> getBackgrounds(final String subreddit, final int count) {
+        String after = "";
+        List<String> results = new LinkedList<String>();
+
+        while (results.size() < count) {
+            String url = String.format(RedditUtils.API, subreddit, after);
+            JsonNode page = getPage(url);
+
+            if (page != null && page.has("data")) {
+                JsonNode data = page.get("data");
+                visit(data, results, count);
+
+                if (!data.has("after")) {
+                    break;
+                }
+
+                after = data.get("after").asText();
+                if (after == null) {
+                    break;
+                }
+            }
+        }
+
+        return results;
+    }
+
+    private static JsonNode getPage(String address) {
+        HttpRequest request = null;
         try {
             request = HttpRequest.get(new URL(address));
-            JsonNode root = new ObjectMapper().readTree(request.execute().getInputStream());
-            if (root.has("data")) {
-                JsonNode data = root.get("data");
-                List<String> results = new LinkedList<String>();
-                visit(data, results, 25);
-                return results;
-            }
+            return new ObjectMapper().readTree(request.execute().getInputStream());
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (JsonProcessingException e) {
@@ -37,8 +57,7 @@ public class RedditUtils {
         } finally {
             Closer.close(request);
         }
-
-        return Collections.emptyList();
+        return null;
     }
 
     private static void visit(JsonNode data, List<String> collector, int limit) {

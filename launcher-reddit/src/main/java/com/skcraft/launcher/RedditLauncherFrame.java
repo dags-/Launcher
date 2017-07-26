@@ -9,7 +9,6 @@ package com.skcraft.launcher;
 import com.skcraft.launcher.dialog.LauncherFrame;
 import com.skcraft.launcher.swing.*;
 import lombok.NonNull;
-import lombok.extern.java.Log;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -18,7 +17,6 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
 
-@Log
 public class RedditLauncherFrame extends LauncherFrame {
 
     public RedditLauncherFrame(@NonNull final Launcher launcher) {
@@ -74,9 +72,7 @@ public class RedditLauncherFrame extends LauncherFrame {
     }
 
     private void redditInit() {
-        String address = String.format("https://reddit.com/r/%s.json", Theme.subreddit);
-        log.info("Set reddit url " + address);
-        RedditBackgroundPanel root = new RedditBackgroundPanel(address, 8000L, Theme.randomise);
+        RedditBackgroundPanel root = new RedditBackgroundPanel(Theme.subreddit, Theme.postCount, Theme.randomise, Theme.interval, Theme.fade);
 
         JPanel launchControls = new JPanel();
         launchControls.setOpaque(false);
