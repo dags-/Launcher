@@ -407,6 +407,8 @@ public class LauncherFrame extends JFrame {
     }
 
     private void launch() {
+        ConsoleFrame.initMessages();
+
         boolean permitUpdate = updateCheck.isSelected();
         Instance instance = launcher.getInstances().get(instancesTable.getSelectedRow());
 

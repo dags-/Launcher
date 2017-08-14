@@ -22,6 +22,7 @@ import lombok.Data;
 public class Configuration {
 
     private boolean offlineEnabled = false;
+    private boolean localJvm = true;
     private String jvmPath;
     private String jvmArgs;
     private int minMemory = 1024;

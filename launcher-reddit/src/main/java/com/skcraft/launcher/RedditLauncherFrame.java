@@ -9,24 +9,20 @@ package com.skcraft.launcher;
 import com.skcraft.launcher.dialog.LauncherFrame;
 import com.skcraft.launcher.swing.*;
 import lombok.NonNull;
-import lombok.extern.java.Log;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
-@Log
 public class RedditLauncherFrame extends LauncherFrame {
-
-    private static final Theme theme = new Theme();
-    private static final Dimension PRIM = new Dimension(125, 55);
-    private static final Dimension SEC = new Dimension(110, 30);
 
     public RedditLauncherFrame(@NonNull final Launcher launcher) {
         super(launcher);
-        setMinimumSize(new Dimension(720, 440));
         setIcons();
+        setMinimumSize(new Dimension(720, 440));
     }
 
     @Override
@@ -36,29 +32,29 @@ public class RedditLauncherFrame extends LauncherFrame {
 
     @Override
     public JButton createPrimaryButton(String name) {
-        JButton button = new ColoredButton(name, theme.primary, theme.primaryAlt);
-        button.setFont(new Font(button.getFont().getName(), Font.PLAIN, theme.primarySize));
-        button.setForeground(theme.primaryText);
-        button.setPreferredSize(PRIM);
+        JButton button = new ColoredButton(name, Theme.primary, Theme.primaryAlt);
+        button.setFont(new Font(button.getFont().getName(), Font.PLAIN, Theme.primarySize));
+        button.setForeground(Theme.primaryText);
+        button.setPreferredSize(Theme.primaryButtonSize);
         return button;
     }
 
     @Override
     protected JButton createSecondaryButton(String name) {
-        JButton button = new ColoredButton(name, theme.secondary, theme.secondaryAlt);
-        button.setFont(new Font(button.getFont().getName(), Font.PLAIN, theme.secondarySize));
-        button.setForeground(theme.secondaryText);
-        button.setPreferredSize(SEC);
+        JButton button = new ColoredButton(name, Theme.secondary, Theme.secondaryAlt);
+        button.setFont(new Font(button.getFont().getName(), Font.PLAIN, Theme.secondarySize));
+        button.setForeground(Theme.secondaryText);
+        button.setPreferredSize(Theme.secondaryButtonSize);
         return button;
     }
 
     @Override
     protected JCheckBox createCheckBox(String name) {
         JCheckBox box = new JCheckBox(name);
-        box.setFont(new Font(box.getFont().getName(), Font.PLAIN, theme.secondarySize));
-        box.setBackground(theme.secondary);
-        box.setForeground(theme.secondaryText);
-        box.setPreferredSize(SEC);
+        box.setFont(new Font(box.getFont().getName(), Font.PLAIN, Theme.secondarySize));
+        box.setBackground(Theme.secondary);
+        box.setForeground(Theme.secondaryText);
+        box.setPreferredSize(Theme.secondaryButtonSize);
         box.setHorizontalAlignment(SwingConstants.CENTER);
         return box;
     }
@@ -68,18 +64,16 @@ public class RedditLauncherFrame extends LauncherFrame {
         super.initComponents();
         getContentPane().removeAll();
         instancesTable.setBackground(new Color(0, 0, 0, 0));
-        instancesTable.setSelectionBackground(theme.primary);
-        instancesTable.setSelectionForeground(theme.primaryText);
-        instancesTable.setForeground(theme.secondaryText);
-        instancesTable.setFont(new Font(instancesTable.getFont().getName(), Font.PLAIN, theme.secondarySize));
+        instancesTable.setSelectionBackground(Theme.primary);
+        instancesTable.setSelectionForeground(Theme.primaryText);
+        instancesTable.setForeground(Theme.secondaryText);
+        instancesTable.setFont(new Font(instancesTable.getFont().getName(), Font.PLAIN, Theme.secondarySize));
         instancesTable.setOpaque(false);
         redditInit();
     }
 
     private void redditInit() {
-        String address = String.format("https://reddit.com/r/%s.json", theme.subreddit);
-        log.info("Set reddit url " + address);
-        RedditBackgroundPanel root = new RedditBackgroundPanel(address, 8000L);
+        RedditBackgroundPanel root = new RedditBackgroundPanel(Theme.subreddit, Theme.postCount, Theme.randomise, Theme.interval, Theme.fade);
 
         JPanel launchControls = new JPanel();
         launchControls.setOpaque(false);
@@ -90,9 +84,9 @@ public class RedditLauncherFrame extends LauncherFrame {
         JPanel updateControls = new JPanel();
         updateControls.add(refreshButton);
         updateControls.add(updateCheck);
-        updateControls.setBackground(getAltFrostColor(theme.frost));
+        updateControls.setBackground(getAltFrostColor(Theme.frost));
 
-        JPanel left = new FrostPanel(root, theme.frost);
+        JPanel left = new FrostPanel(root, Theme.frost);
         left.setLayout(new BorderLayout());
         left.add(instancesTable, BorderLayout.CENTER);
         left.add(updateControls, BorderLayout.PAGE_END);
@@ -113,7 +107,7 @@ public class RedditLauncherFrame extends LauncherFrame {
     private void setIcons() {
         Image mainIcon = SwingHelper.createImage(LauncherFrame.class, "/com/skcraft/launcher/icon.png");
         Image titleIcon = SwingHelper.createImage(LauncherFrame.class, "/com/skcraft/launcher/title.png");
-        List<Image> icons = new ArrayList<Image>();
+        ArrayList<Image> icons = new ArrayList<Image>();
         if (mainIcon != null) {
             icons.add(mainIcon);
         }
@@ -125,10 +119,13 @@ public class RedditLauncherFrame extends LauncherFrame {
 
     private JLabel getHeaderImage() {
         JLabel label = new JLabel();
-        Image image = SwingHelper.createImage(RedditLauncher.class, "/com/skcraft/launcher/header.png");
-        if (image != null) {
-            label = new JLabel(new ImageIcon(image));
+        try {
+            BufferedImage image = ImageIO.read(RedditLauncher.class.getResourceAsStream("/com/skcraft/launcher/header.png"));
+            int width = Math.min(image.getWidth(), 350);
+            label.setIcon(new ImageIcon(image.getScaledInstance(width, -1, Image.SCALE_SMOOTH)));
             label.setHorizontalAlignment(SwingConstants.RIGHT);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         return label;
     }

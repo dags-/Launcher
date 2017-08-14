@@ -20,6 +20,7 @@ import com.skcraft.launcher.model.minecraft.VersionManifest;
 import com.skcraft.launcher.persistence.Persistence;
 import com.skcraft.launcher.swing.SwingHelper;
 import com.skcraft.launcher.update.UpdateManager;
+import com.skcraft.launcher.util.Closer;
 import com.skcraft.launcher.util.HttpRequest;
 import com.skcraft.launcher.util.SharedLocale;
 import com.skcraft.launcher.util.SimpleLogFormatter;
@@ -32,10 +33,7 @@ import org.apache.commons.io.FileUtils;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.File;
-import java.io.FileFilter;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.lang.management.ManagementFactory;
 import java.lang.reflect.Method;
 import java.net.URL;
@@ -43,6 +41,8 @@ import java.net.URLEncoder;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.concurrent.Executors;
+import java.util.jar.Attributes;
+import java.util.jar.Manifest;
 import java.util.logging.Level;
 
 import static com.skcraft.launcher.util.SharedLocale.tr;
@@ -413,14 +413,8 @@ public final class Launcher {
      * @param args args
      */
     public static void main(final String[] args) {
-        Method main = getLauncher();
-        if (main != null) {
-            try {
-                main.invoke(null, (Object) args);
-                return;
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        if (redirect(args)) {
+            return;
         }
 
         setupLogger();
@@ -440,23 +434,31 @@ public final class Launcher {
                 }
             }
         });
-
     }
 
-    private static Method getLauncher() {
-        String[] launchers = {"RedditLauncher", "FancyLauncher"};
-        for (String s : launchers) {
-            String path = String.format("com.skcraft.launcher.%s", s);
-            try {
-                Class<?> clazz = Class.forName(path);
-                Method main = clazz.getMethod("main", String[].class);
-                if (main != null) {
-                    return main;
-                }
-            } catch (Exception ignored) {
-                ignored.printStackTrace();
-            }
+    private static boolean redirect(String[] args) {
+        final InputStream inputStream = Launcher.class.getResourceAsStream("/META-INF/MANIFEST.MF");
+
+        if (inputStream == null) {
+            return false;
         }
-        return null;
+
+        try {
+            Manifest manifest = new Manifest(inputStream);
+            Attributes attributes = manifest.getMainAttributes();
+            String main = attributes.getValue("Main-Class");
+            if (main == null || main.equals(Launcher.class.getCanonicalName())) {
+                return false;
+            }
+            Class<?> clazz = Class.forName(main);
+            Method target = clazz.getMethod("main", String[].class);
+            target.invoke(null, (Object) args);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            Closer.close(inputStream);
+        }
     }
 }
