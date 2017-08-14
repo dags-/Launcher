@@ -29,6 +29,7 @@ public class ConfigurationDialog extends JDialog {
     private final JPanel tabContainer = new JPanel(new BorderLayout());
     private final JTabbedPane tabbedPane = new JTabbedPane();
     private final FormPanel javaSettingsPanel = new FormPanel();
+    private final JCheckBox localJvm = new JCheckBox(SharedLocale.tr("options.useLocalJvm"));
     private final JTextField jvmPathText = new JTextField();
     private final JTextField jvmArgsText = new JTextField();
     private final JSpinner minMemorySpinner = new JSpinner();
@@ -70,6 +71,7 @@ public class ConfigurationDialog extends JDialog {
         setResizable(false);
         setLocationRelativeTo(owner);
 
+        mapper.map(localJvm, "localJvm");
         mapper.map(jvmPathText, "jvmPath");
         mapper.map(jvmArgsText, "jvmArgs");
         mapper.map(minMemorySpinner, "minMemory");
@@ -88,6 +90,7 @@ public class ConfigurationDialog extends JDialog {
     }
 
     private void initComponents() {
+        javaSettingsPanel.addRow(localJvm);
         javaSettingsPanel.addRow(new JLabel(SharedLocale.tr("options.jvmPath")), jvmPathText);
         javaSettingsPanel.addRow(new JLabel(SharedLocale.tr("options.jvmArguments")), jvmArgsText);
         javaSettingsPanel.addRow(Box.createVerticalStrut(15));

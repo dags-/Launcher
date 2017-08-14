@@ -7,6 +7,8 @@
 package com.skcraft.launcher.launch;
 
 import com.skcraft.concurrency.SettableProgress;
+import com.skcraft.launcher.Configuration;
+import com.skcraft.launcher.Launcher;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -38,8 +40,12 @@ public class JavaProcessBuilder {
     @Getter private final List<String> args = new ArrayList<String>();
     @Getter @Setter private String mainClass;
 
-    public JavaProcessBuilder(SettableProgress progress) {
-        this.jvmPath = JavaRuntimeFinder.findBestJavaPath(progress);
+    public JavaProcessBuilder(Configuration config, SettableProgress progress) {
+        if (config.isLocalJvm()) {
+            this.jvmPath = new JavaRuntimeFetcher(progress).findJRE();
+        } else {
+            this.jvmPath = JavaRuntimeFinder.findBestJavaPath(progress);
+        }
     }
 
     public void tryJvmPath(File path) throws IOException {
