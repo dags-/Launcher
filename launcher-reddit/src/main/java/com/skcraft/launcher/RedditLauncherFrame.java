@@ -63,6 +63,7 @@ public class RedditLauncherFrame extends LauncherFrame {
     protected void initComponents() {
         super.initComponents();
         getContentPane().removeAll();
+        instancesTable.setBackground(new Color(0, 0, 0, 0));
         instancesTable.setSelectionBackground(Theme.primary);
         instancesTable.setSelectionForeground(Theme.primaryText);
         instancesTable.setForeground(Theme.secondaryText);
