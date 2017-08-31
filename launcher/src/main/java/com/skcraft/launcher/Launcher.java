@@ -40,6 +40,7 @@ import java.io.UnsupportedEncodingException;
 import java.lang.management.ManagementFactory;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.Locale;
 import java.util.Properties;
@@ -441,14 +442,16 @@ public final class Launcher {
     }
 
     private static boolean redirect(String[] args) {
-        URL location = Launcher.class.getProtectionDomain().getCodeSource().getLocation();
+        String path = Launcher.class.getProtectionDomain().getCodeSource().getLocation().getPath();
         JarFile jarFile = null;
 
         try {
-            jarFile  = new JarFile(location.getFile());
+            String file = URLDecoder.decode(path, "UTF-8");
+            jarFile  = new JarFile(file);
+
             Manifest manifest = jarFile.getManifest();
             if (manifest == null) {
-                log.warning("Could not read Manifest of jar: " + location);
+                log.warning("Could not read Manifest of jar: " + file);
                 return false;
             }
 
