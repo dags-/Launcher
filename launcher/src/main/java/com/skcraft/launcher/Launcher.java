@@ -33,7 +33,10 @@ import org.apache.commons.io.FileUtils;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.*;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.lang.management.ManagementFactory;
 import java.lang.reflect.Method;
 import java.net.URL;
@@ -42,6 +45,7 @@ import java.util.Locale;
 import java.util.Properties;
 import java.util.concurrent.Executors;
 import java.util.jar.Attributes;
+import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 import java.util.logging.Level;
 
@@ -437,28 +441,35 @@ public final class Launcher {
     }
 
     private static boolean redirect(String[] args) {
-        final InputStream inputStream = Launcher.class.getResourceAsStream("/META-INF/MANIFEST.MF");
-
-        if (inputStream == null) {
-            return false;
-        }
+        URL location = Launcher.class.getProtectionDomain().getCodeSource().getLocation();
+        JarFile jarFile = null;
 
         try {
-            Manifest manifest = new Manifest(inputStream);
+            jarFile  = new JarFile(location.getFile());
+            Manifest manifest = jarFile.getManifest();
+            if (manifest == null) {
+                log.warning("Could not read Manifest of jar: " + location);
+                return false;
+            }
+
             Attributes attributes = manifest.getMainAttributes();
             String main = attributes.getValue("Main-Class");
             if (main == null || main.equals(Launcher.class.getCanonicalName())) {
+                log.info("Ignoring main class: " + main);
                 return false;
             }
+
             Class<?> clazz = Class.forName(main);
             Method target = clazz.getMethod("main", String[].class);
             target.invoke(null, (Object) args);
+
             return true;
-        } catch (Exception e) {
+        } catch (Throwable e) {
+            log.warning("Launcher.main redirect failed!");
             e.printStackTrace();
             return false;
         } finally {
-            Closer.close(inputStream);
+            Closer.close(jarFile);
         }
     }
 }
