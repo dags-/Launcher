@@ -7,9 +7,6 @@
 package com.skcraft.launcher.launch;
 
 import com.skcraft.concurrency.SettableProgress;
-import com.skcraft.launcher.Configuration;
-import com.skcraft.launcher.util.Environment;
-import com.skcraft.launcher.util.Platform;
 import com.skcraft.launcher.util.WinRegistry;
 import lombok.extern.java.Log;
 
@@ -36,10 +33,6 @@ public final class JavaRuntimeFinder {
      * @return the JVM location, or null
      */
     public static File findBestJavaPath(SettableProgress progress) {
-        if (Environment.getInstance().getPlatform() != Platform.WINDOWS) {
-            return findLocalJRE(progress);
-        }
-        
         List<JREEntry> entries = new ArrayList<JREEntry>();
         try {
             getEntriesFromRegistry(entries, "SOFTWARE\\JavaSoft\\Java Runtime Environment");
@@ -60,16 +53,6 @@ public final class JavaRuntimeFinder {
             }
         }
         
-        return findLocalJRE(progress);
-    }
-
-    private static File findLocalJRE(SettableProgress progress) {
-        log.log(Level.INFO, "Searching for local JRE");
-        File localJre = new JavaRuntimeFetcher(progress).findJRE();
-        if (localJre != null && localJre.exists()) {
-            log.log(Level.INFO, "Local JRE detected: {0}", localJre);
-            return localJre;
-        }
         return null;
     }
     

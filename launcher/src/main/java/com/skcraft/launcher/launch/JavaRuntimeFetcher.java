@@ -17,10 +17,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
-import java.util.Collections;
 import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -35,9 +32,11 @@ public class JavaRuntimeFetcher {
 
     @Getter
     private final SettableProgress progress;
+    private final File baseDir;
 
-    public JavaRuntimeFetcher(SettableProgress progress) {
+    public JavaRuntimeFetcher(File baseDir, SettableProgress progress) {
         this.progress = progress;
+        this.baseDir = baseDir;
     }
 
     public File findJRE() {
@@ -88,7 +87,7 @@ public class JavaRuntimeFetcher {
     }
 
     private File getRuntimeDir() {
-        return resolve(new File("").getAbsoluteFile(), "runtime");
+        return resolve(baseDir.getAbsoluteFile(), "runtime");
     }
 
     private void installJRE() {

@@ -101,7 +101,7 @@ public class Runner implements Callable<Process>, ProgressObservable {
         progress = settableProgress;
 
         config = launcher.getConfig();
-        builder = new JavaProcessBuilder(config, settableProgress);
+        builder = new JavaProcessBuilder(config, launcher.getBaseDir(), settableProgress);
         assetsRoot = launcher.getAssets();
 
         // Load manifiests

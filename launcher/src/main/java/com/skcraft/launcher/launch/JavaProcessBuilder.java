@@ -8,7 +8,6 @@ package com.skcraft.launcher.launch;
 
 import com.skcraft.concurrency.SettableProgress;
 import com.skcraft.launcher.Configuration;
-import com.skcraft.launcher.Launcher;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -40,9 +39,9 @@ public class JavaProcessBuilder {
     @Getter private final List<String> args = new ArrayList<String>();
     @Getter @Setter private String mainClass;
 
-    public JavaProcessBuilder(Configuration config, SettableProgress progress) {
+    public JavaProcessBuilder(Configuration config, File baseDir, SettableProgress progress) {
         if (config.isLocalJvm()) {
-            this.jvmPath = new JavaRuntimeFetcher(progress).findJRE();
+            this.jvmPath = new JavaRuntimeFetcher(baseDir, progress).findJRE();
             if (this.jvmPath == null) {
                 this.jvmPath = JavaRuntimeFinder.findBestJavaPath(progress);
             }
