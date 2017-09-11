@@ -17,10 +17,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
-import java.util.Collections;
 import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -51,12 +48,12 @@ public class JavaRuntimeFetcher {
 
         File x64 = resolve(runtime, "jre-x64");
         File jre = getLatestJRE(x64);
-        if (jre == null) {
+        if (jre == null || !jre.isDirectory()) {
             installJRE();
         }
 
         jre = getLatestJRE(x64);
-        if (jre == null) {
+        if (jre == null || !jre.isDirectory()) {
             log.log(Level.WARNING, "Could not locate JRE in: {0}, exists: {1}", new Object[]{x64, x64.exists()});
             return null;
         }
@@ -135,6 +132,10 @@ public class JavaRuntimeFetcher {
 
         File latest = null;
         for (File jre : jres) {
+            // ignore files and hidden folders
+            if (!jre.isDirectory() || jre.getName().startsWith(".")) {
+                continue;
+            }
             if (latest == null || jre.lastModified() > latest.lastModified()) {
                 latest = jre;
             }
