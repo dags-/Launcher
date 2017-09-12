@@ -26,7 +26,7 @@ import java.util.concurrent.atomic.AtomicReference;
 @Log
 public class RedditBackgroundPanel extends JPanel implements Runnable, ActionListener, Paintable {
 
-    private static final ImageFader EMPTY = getEmptyFader();
+    private static final ImageFader DEFAULT = defaultFader();
 
     private final AtomicReference<ImageFader> reference;
     private final AtomicBoolean showing;
@@ -39,7 +39,7 @@ public class RedditBackgroundPanel extends JPanel implements Runnable, ActionLis
     private final long fade;
 
     public RedditBackgroundPanel(String subreddit, int postCount, boolean randomise, long interval, long fade) {
-        this.reference = new AtomicReference<ImageFader>(EMPTY);
+        this.reference = new AtomicReference<ImageFader>(DEFAULT);
         this.showing = new AtomicBoolean(true);
         this.repaint = new AtomicBoolean(true);
         this.timer = new Timer(200, this);
@@ -88,6 +88,7 @@ public class RedditBackgroundPanel extends JPanel implements Runnable, ActionLis
 
         int index = 0;
         List<String> targets = RedditUtils.getBackgrounds(subreddit, postCount);
+        SwingUtilities.invokeLater(postInit());
 
         log.info(String.format("Found %s/%s backgrounds for subreddit: %s", targets.size(), postCount, subreddit));
         if (random) {
@@ -118,6 +119,10 @@ public class RedditBackgroundPanel extends JPanel implements Runnable, ActionLis
         log.info("Stopping async background image loader thread...");
     }
 
+    private Component self() {
+        return SwingUtilities.getWindowAncestor(this);
+    }
+
     private ImageFader getImage(String address) {
         InputStream inputStream = null;
         try {
@@ -138,8 +143,18 @@ public class RedditBackgroundPanel extends JPanel implements Runnable, ActionLis
         return null;
     }
 
-    private static ImageFader getEmptyFader() {
-        BufferedImage blank = new BufferedImage(720, 480, BufferedImage.TYPE_INT_RGB);
+    private Runnable postInit() {
+        return new Runnable() {
+            @Override
+            public void run() {
+                Dimension img = new Dimension(DEFAULT.getTo().getWidth(), DEFAULT.getTo().getHeight());
+                self().setMinimumSize(img);
+            }
+        };
+    }
+
+    private static ImageFader defaultFader() {
+        BufferedImage blank = new BufferedImage(0x2d0, 0x1b8, BufferedImage.TYPE_INT_RGB);
         return new ImageFader(blank, blank, 1000L);
     }
 }

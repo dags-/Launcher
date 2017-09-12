@@ -1,5 +1,6 @@
 package com.skcraft.launcher;
 
+import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
 import java.util.Properties;
@@ -25,6 +26,8 @@ public class Theme {
     public static final int secondarySize;
     public static final Dimension primaryButtonSize;
     public static final Dimension secondaryButtonSize;
+    public static final String headerAlignY;
+    public static final int headerAlignX;
 
     static  {
         String _subreddit = "";
@@ -45,6 +48,8 @@ public class Theme {
         int primButH = 55;
         int secButW = 110;
         int secButH = 30;
+        String alignY = "top";
+        String alignX = "right";
 
         Properties p = new Properties();
         try {
@@ -73,6 +78,9 @@ public class Theme {
             primButH = Integer.parseInt(p.getProperty("primary.button.height"));
             secButW = Integer.parseInt(p.getProperty("secondary.button.width"));
             secButH = Integer.parseInt(p.getProperty("secondary.button.height"));
+
+            alignY = p.getProperty("header.align.y");
+            alignX = p.getProperty("header.align.x");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -93,5 +101,30 @@ public class Theme {
         frost = _frost;
         primaryButtonSize = new Dimension(primButW, primButH);
         secondaryButtonSize = new Dimension(secButW, secButH);
+        headerAlignY = alignmentY(alignY);
+        headerAlignX = alignmentX(alignX);
+    }
+
+    private static String alignmentY(String in) {
+        if (in.equalsIgnoreCase("top")) {
+            return BorderLayout.PAGE_START;
+        }
+        if (in.equalsIgnoreCase("center")) {
+            return BorderLayout.CENTER;
+        }
+        if (in.equalsIgnoreCase("bottom")) {
+            return BorderLayout.PAGE_END;
+        }
+        return BorderLayout.PAGE_START;
+    }
+
+    private static int alignmentX(String in) {
+        if (in.equalsIgnoreCase("left")) {
+            return SwingConstants.LEFT;
+        }
+        if (in.equalsIgnoreCase("right")) {
+            return SwingConstants.RIGHT;
+        }
+        return SwingConstants.CENTER;
     }
 }

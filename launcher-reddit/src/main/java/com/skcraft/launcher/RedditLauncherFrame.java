@@ -94,7 +94,7 @@ public class RedditLauncherFrame extends LauncherFrame {
         JPanel center = new JPanel();
         center.setOpaque(false);
         center.setLayout(new BorderLayout());
-        center.add(getHeaderImage(), BorderLayout.PAGE_START);
+        center.add(getHeaderImage(), Theme.headerAlignY);
         center.add(launchControls, BorderLayout.PAGE_END);
 
         root.setLayout(new BorderLayout());
@@ -123,7 +123,7 @@ public class RedditLauncherFrame extends LauncherFrame {
             BufferedImage image = ImageIO.read(RedditLauncher.class.getResourceAsStream("/com/skcraft/launcher/header.png"));
             int width = Math.min(image.getWidth(), 350);
             label.setIcon(new ImageIcon(image.getScaledInstance(width, -1, Image.SCALE_SMOOTH)));
-            label.setHorizontalAlignment(SwingConstants.RIGHT);
+            label.setHorizontalAlignment(Theme.headerAlignX);
         } catch (IOException e) {
             e.printStackTrace();
         }
