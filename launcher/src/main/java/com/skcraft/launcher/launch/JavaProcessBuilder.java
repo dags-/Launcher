@@ -8,7 +8,6 @@ package com.skcraft.launcher.launch;
 
 import com.skcraft.concurrency.SettableProgress;
 import com.skcraft.launcher.Configuration;
-import com.skcraft.launcher.Launcher;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
