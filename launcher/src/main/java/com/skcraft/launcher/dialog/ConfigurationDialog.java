@@ -23,6 +23,7 @@ import java.awt.event.ActionListener;
  */
 public class ConfigurationDialog extends JDialog {
 
+    private final Window window;
     private final Configuration config;
     private final ObjectSwingMapper mapper;
 
@@ -38,6 +39,7 @@ public class ConfigurationDialog extends JDialog {
     private final FormPanel gameSettingsPanel = new FormPanel();
     private final JSpinner widthSpinner = new JSpinner();
     private final JSpinner heightSpinner = new JSpinner();
+    private final FloatSlider scaleSlider = new FloatSlider(1F, 4F);
     private final FormPanel proxySettingsPanel = new FormPanel();
     private final JCheckBox useProxyCheck = new JCheckBox(SharedLocale.tr("options.useProxyCheck"));
     private final JTextField proxyHostText = new JTextField();
@@ -61,6 +63,7 @@ public class ConfigurationDialog extends JDialog {
     public ConfigurationDialog(Window owner, @NonNull Launcher launcher) {
         super(owner, ModalityType.DOCUMENT_MODAL);
 
+        this.window = owner;
         this.config = launcher.getConfig();
         mapper = new ObjectSwingMapper(config);
 
@@ -79,6 +82,7 @@ public class ConfigurationDialog extends JDialog {
         mapper.map(permGenSpinner, "permGen");
         mapper.map(widthSpinner, "windowWidth");
         mapper.map(heightSpinner, "widowHeight");
+        mapper.map(scaleSlider, "windowScale");
         mapper.map(useProxyCheck, "proxyEnabled");
         mapper.map(proxyHostText, "proxyHost");
         mapper.map(proxyPortText, "proxyPort");
@@ -115,6 +119,7 @@ public class ConfigurationDialog extends JDialog {
         tabbedPane.addTab(SharedLocale.tr("options.proxyTab"), SwingHelper.alignTabbedPane(proxySettingsPanel));
 
         advancedPanel.addRow(new JLabel(SharedLocale.tr("options.gameKey")), gameKeyText);
+        advancedPanel.addRow(new JLabel(SharedLocale.tr("options.launcherScale")), scaleSlider);
         SwingHelper.removeOpaqueness(advancedPanel);
         tabbedPane.addTab(SharedLocale.tr("options.advancedTab"), SwingHelper.alignTabbedPane(advancedPanel));
 

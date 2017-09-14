@@ -96,6 +96,23 @@ public class ObjectSwingMapper {
         });
     }
 
+    public void map(@NonNull final FloatSlider slider, String name) {
+        final MutatorAccessorField<Float> field = getField(name, float.class);
+
+        add(new FieldMapping() {
+            @Override
+            public void copyFromObject() {
+                slider.setValue(field.get());
+            }
+
+            @SuppressWarnings("unchecked")
+            @Override
+            public void copyFromSwing() {
+                field.set(slider.getFloatValue());
+            }
+        });
+    }
+
     public static interface FieldMapping {
         void copyFromObject();
         void copyFromSwing();

@@ -7,6 +7,7 @@
 package com.skcraft.launcher;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.skcraft.launcher.util.ComponentScaler;
 import lombok.Data;
 
 /**
@@ -30,6 +31,7 @@ public class Configuration {
     private int permGen = 256;
     private int windowWidth = 854;
     private int widowHeight = 480;
+    private float windowScale = ComponentScaler.guessScale();
     private boolean proxyEnabled = false;
     private String proxyHost = "localhost";
     private int proxyPort = 8080;

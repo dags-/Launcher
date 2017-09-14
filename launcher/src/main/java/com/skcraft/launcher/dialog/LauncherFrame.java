@@ -15,6 +15,7 @@ import com.skcraft.launcher.launch.LaunchListener;
 import com.skcraft.launcher.launch.LaunchOptions;
 import com.skcraft.launcher.launch.LaunchOptions.UpdatePolicy;
 import com.skcraft.launcher.swing.*;
+import com.skcraft.launcher.util.ComponentScaler;
 import com.skcraft.launcher.util.SharedLocale;
 import com.skcraft.launcher.util.SwingExecutor;
 import lombok.Getter;
@@ -64,7 +65,7 @@ public class LauncherFrame extends JFrame {
      *
      * @param launcher the launcher
      */
-    public LauncherFrame(@NonNull Launcher launcher) {
+    public LauncherFrame(@NonNull final Launcher launcher) {
         super(tr("launcher.title", launcher.getVersion()));
         this.launcher = launcher;
         instancesModel = new InstanceTableModel(launcher.getInstances());
@@ -170,6 +171,14 @@ public class LauncherFrame extends JFrame {
                     selected = launcher.getInstances().get(index);
                 }
                 popupInstanceMenu(e.getComponent(), e.getX(), e.getY(), selected);
+            }
+        });
+
+        final Component instance = this;
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                ComponentScaler.scale(instance, launcher.getConfig().getWindowScale());
             }
         });
     }

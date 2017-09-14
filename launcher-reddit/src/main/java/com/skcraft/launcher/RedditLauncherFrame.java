@@ -88,6 +88,7 @@ public class RedditLauncherFrame extends LauncherFrame {
 
         JPanel left = new FrostPanel(root, Theme.frost);
         left.setLayout(new BorderLayout());
+        left.setPreferredSize(new Dimension(250, 300));
         left.add(instancesTable, BorderLayout.CENTER);
         left.add(updateControls, BorderLayout.PAGE_END);
 

@@ -28,7 +28,7 @@ public class ColoredButton extends JButton implements MouseListener {
     @Override
     public void paintComponent(Graphics graphics) {
         graphics.setColor(mousePressed ? pressed : background);
-        graphics.fillRect(0, 0, getWidth(), getHeight());
+        graphics.fillRect(0, 0, getSize().width, getSize().height);
         label.setSize(getWidth(), getHeight());
         label.setForeground(getForeground());
         label.setFont(getFont());
