@@ -37,7 +37,7 @@ public class JavaRuntimeFetcher {
 
     public JavaRuntimeFetcher(Launcher launcher, SettableProgress progress) {
         this.progress = progress;
-        this.installDir = launcher.getInstallerDir();
+        this.installDir = launcher.getBaseDir();
     }
 
     public File findJRE() {
