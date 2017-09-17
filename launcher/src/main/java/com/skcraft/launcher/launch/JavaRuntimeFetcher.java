@@ -3,6 +3,7 @@ package com.skcraft.launcher.launch;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.skcraft.concurrency.SettableProgress;
+import com.skcraft.launcher.Launcher;
 import com.skcraft.launcher.util.Closer;
 import com.skcraft.launcher.util.Environment;
 import com.skcraft.launcher.util.Platform;
@@ -32,9 +33,11 @@ public class JavaRuntimeFetcher {
 
     @Getter
     private final SettableProgress progress;
+    private final File installDir;
 
-    public JavaRuntimeFetcher(SettableProgress progress) {
+    public JavaRuntimeFetcher(Launcher launcher, SettableProgress progress) {
         this.progress = progress;
+        this.installDir = launcher.getInstallerDir();
     }
 
     public File findJRE() {
@@ -85,7 +88,7 @@ public class JavaRuntimeFetcher {
     }
 
     private File getRuntimeDir() {
-        return resolve(new File("").getAbsoluteFile(), "runtime");
+        return resolve(installDir.getAbsoluteFile(), "runtime");
     }
 
     private void installJRE() {
