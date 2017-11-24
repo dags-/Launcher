@@ -14,6 +14,7 @@ import com.skcraft.launcher.LauncherUtils;
 import com.skcraft.launcher.launch.LaunchListener;
 import com.skcraft.launcher.launch.LaunchOptions;
 import com.skcraft.launcher.launch.LaunchOptions.UpdatePolicy;
+import com.skcraft.launcher.persistence.Persistence;
 import com.skcraft.launcher.swing.*;
 import com.skcraft.launcher.util.ComponentScaler;
 import com.skcraft.launcher.util.SharedLocale;
@@ -104,7 +105,15 @@ public class LauncherFrame extends JFrame {
             }
         });
 
-        updateCheck.setSelected(true);
+        updateCheck.setSelected(launcher.getConfig().isAutoUpdate());
+        updateCheck.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                launcher.getConfig().setAutoUpdate(updateCheck.isSelected());
+                Persistence.commitAndForget(launcher.getConfig());
+            }
+        });
+
         instancesTable.setModel(instancesModel);
         launchButton.setFont(launchButton.getFont().deriveFont(Font.BOLD));
         splitPane.setDividerLocation(200);
