@@ -63,6 +63,7 @@ public class LoginDialog extends JDialog {
 
         setTitle(SharedLocale.tr("login.title"));
         initComponents();
+        loadLastUser();
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setMinimumSize(new Dimension(420, 0));
         setResizable(false);
@@ -178,6 +179,24 @@ public class LoginDialog extends JDialog {
         });
     }
 
+    private void loadLastUser() {
+        for (int i = 0; i < idCombo.getItemCount(); i++) {
+            Object o = idCombo.getItemAt(i);
+            if (o instanceof Account) {
+                Account account = (Account) o;
+                if (account.getId().equals(launcher.getConfig().getLastUser())) {
+                    idCombo.setSelectedItem(o);
+                    return;
+                }
+            }
+        }
+    }
+
+    private void saveLastUser(Account account) {
+        launcher.getConfig().setLastUser(account.getId());
+        Persistence.commitAndForget(launcher.getConfig());
+    }
+
     private void popupManageMenu(Component component, int x, int y) {
         Object selected = idCombo.getSelectedItem();
         JPopupMenu popup = new JPopupMenu();
@@ -258,6 +277,8 @@ public class LoginDialog extends JDialog {
             if (password == null || password.isEmpty()) {
                 SwingHelper.showErrorDialog(this, SharedLocale.tr("login.noPasswordError"), SharedLocale.tr("login.noPasswordTitle"));
             } else {
+                saveLastUser(account);
+
                 if (rememberPassCheck.isSelected()) {
                     account.setPassword(password);
                 } else {
