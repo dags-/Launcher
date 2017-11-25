@@ -38,6 +38,8 @@ local.properties
 # TeXlipse plugin
 .texlipse
 
+.DS_Store
+
 
 ### NetBeans ###
 nbproject/private/
