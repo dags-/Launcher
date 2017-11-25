@@ -8,6 +8,7 @@ jar {
 
 dependencies {
     compile 'org.projectlombok:lombok:1.12.2'
+    compile 'javax.xml.bind:jaxb-api:2.2.4'
     compile 'com.googlecode.json-simple:json-simple:1.1.1'
 }
 
