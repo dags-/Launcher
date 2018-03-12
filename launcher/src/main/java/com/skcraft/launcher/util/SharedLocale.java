@@ -6,6 +6,8 @@
 
 package com.skcraft.launcher.util;
 
+import java.util.ArrayList;
+import java.util.List;
 import lombok.NonNull;
 import lombok.extern.java.Log;
 
@@ -22,7 +24,7 @@ import java.util.logging.Level;
 public class SharedLocale {
 
     private static Locale locale = Locale.getDefault();
-    private static ResourceBundle bundle;
+    private static final List<ResourceBundle> bundles = new ArrayList<ResourceBundle>();
 
     /**
      * Get the current locale.
@@ -34,15 +36,6 @@ public class SharedLocale {
     }
 
     /**
-     * Get the current resource bundle.
-     *
-     * @return the current resource bundle, or null if not available
-     */
-    public static ResourceBundle getBundle() {
-        return bundle;
-    }
-
-    /**
      * Translate a string.
      *
      * <p>If the string is not available, then ${key} will be returned.</p>
@@ -51,12 +44,17 @@ public class SharedLocale {
      * @return the translated string
      */
     public static String tr(String key) {
-        if (bundle != null) {
+        MissingResourceException exception = null;
+        for (ResourceBundle bundle : bundles) {
             try {
                 return bundle.getString(key);
             } catch (MissingResourceException e) {
-                log.log(Level.WARNING, "Failed to find message", e);
+                exception =  e;
             }
+        }
+
+        if (exception != null) {
+            log.log(Level.WARNING, "Failed to find message", exception);
         }
 
         return "${" + key + "}";
@@ -72,14 +70,12 @@ public class SharedLocale {
      * @return a translated string
      */
     public static String tr(String key, Object... args) {
-        if (bundle != null) {
-            try {
-                MessageFormat formatter = new MessageFormat(tr(key));
-                formatter.setLocale(getLocale());
-                return formatter.format(args);
-            } catch (MissingResourceException e) {
-                log.log(Level.WARNING, "Failed to find message", e);
-            }
+        try {
+            MessageFormat formatter = new MessageFormat(tr(key));
+            formatter.setLocale(getLocale());
+            return formatter.format(args);
+        } catch (MissingResourceException e) {
+            log.log(Level.WARNING, "Failed to find message", e);
         }
 
         return "${" + key + "}:" + args;
@@ -95,8 +91,7 @@ public class SharedLocale {
     public static boolean loadBundle(@NonNull String baseName, @NonNull Locale locale) {
         try {
             SharedLocale.locale = locale;
-            bundle = ResourceBundle.getBundle(baseName, locale,
-                    SharedLocale.class.getClassLoader());
+            bundles.add(ResourceBundle.getBundle(baseName, locale, SharedLocale.class.getClassLoader()));
             return true;
         } catch (MissingResourceException e) {
             log.log(Level.SEVERE, "Failed to load resource bundle", e);

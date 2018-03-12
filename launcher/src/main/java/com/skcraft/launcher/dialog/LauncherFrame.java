@@ -401,7 +401,7 @@ public class LauncherFrame extends JFrame {
         }, SwingExecutor.INSTANCE);
     }
 
-    private void loadInstances() {
+    protected void loadInstances() {
         ObservableFuture<InstanceList> future = launcher.getInstanceTasks().reloadInstances(this);
 
         future.addListener(new Runnable() {
@@ -424,7 +424,7 @@ public class LauncherFrame extends JFrame {
         configDialog.setVisible(true);
     }
 
-    private void launch() {
+    protected void launch() {
         ConsoleFrame.initMessages();
 
         boolean permitUpdate = updateCheck.isSelected();
@@ -439,11 +439,11 @@ public class LauncherFrame extends JFrame {
         launcher.getLaunchSupervisor().launch(options);
     }
 
-    private static class LaunchListenerImpl implements LaunchListener {
+    protected static class LaunchListenerImpl implements LaunchListener {
         private final WeakReference<LauncherFrame> frameRef;
         private final Launcher launcher;
 
-        private LaunchListenerImpl(LauncherFrame frame) {
+        public LaunchListenerImpl(LauncherFrame frame) {
             this.frameRef = new WeakReference<LauncherFrame>(frame);
             this.launcher = frame.launcher;
         }

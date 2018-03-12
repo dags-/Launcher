@@ -120,7 +120,7 @@ public class RedditLauncherFrame extends LauncherFrame {
         setIconImages(icons);
     }
 
-    private JLabel getHeaderImage() {
+    protected JLabel getHeaderImage() {
         JLabel label = new JLabel();
         try {
             BufferedImage image = ImageIO.read(RedditLauncher.class.getResourceAsStream("/com/skcraft/launcher/header.png"));
